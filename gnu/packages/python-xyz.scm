@@ -214,6 +214,8 @@
   #:use-module (gnu packages tcl)
   #:use-module (gnu packages bdw-gc)
   #:use-module (gnu packages serialization)
+  #:use-module (gnu packages libusb)
+  #:use-module (gnu packages security-token)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
@@ -26274,3 +26276,357 @@ a (rather superficial) static analysis, and constructs a directed graph of the
 objects in the combined source, and how they define or use each other.  The
 graph can be output for rendering by GraphViz or yEd.")
     (license license:gpl2)))
+
+(define-public python-pep8-naming
+  (package
+    (name "python-pep8-naming")
+    (version "0.12.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "pep8-naming" version))
+        (sha256
+          (base32
+            "0hbqr8q8c7fm46d8kwlj2v6hb402rsjdnmdd9jm65lapfya5a95v"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-flake8" ,python-flake8)
+        ("python-flake8-polyfill"
+         ,python-flake8-polyfill)))
+    (home-page
+      "https://github.com/PyCQA/pep8-naming")
+    (synopsis
+      "Check PEP-8 naming conventions, plugin for flake8")
+    (description
+      "Check PEP-8 naming conventions, plugin for flake8")
+    (license license:expat)))
+
+(define-public python-verspec
+  (package
+    (name "python-verspec")
+    (version "0.1.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "verspec" version))
+        (sha256
+          (base32
+            "07n06wv85fm4vl1ird2mja0823js3x322wgs9gdnq1djjyk4ql64"))))
+    (build-system python-build-system)
+    (native-inputs
+      `(("python-coverage" ,python-coverage)
+        ("python-flake8" ,python-flake8)
+        ("python-mypy" ,python-mypy)
+        ("python-pretend" ,python-pretend)
+        ("python-pytest" ,python-pytest)))
+    (home-page
+      "https://github.com/jimporter/verspec")
+    (synopsis "Flexible version handling")
+    (description "Flexible version handling")
+    (license '(license:asl2.0 license:bsd-2))))
+
+(define-public python-mike
+  (package
+    (name "python-mike")
+    (version "1.0.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "mike" version))
+        (sha256
+          (base32
+            "17kqn42f6fxlyahlkkw76zr7df5010b9fv9zw11vslnp0lfz123q"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-jinja2" ,python-jinja2)
+        ("python-mkdocs" ,python-mkdocs)
+        ("python-pyyaml" ,python-pyyaml)
+        ("python-verspec" ,python-verspec)))
+    (native-inputs
+      `(("python-coverage" ,python-coverage)
+        ("python-flake8" ,python-flake8)))
+    (home-page "https://github.com/jimporter/mike")
+    (synopsis
+      "Manage multiple versions of your MkDocs-powered documentation")
+    (description
+      "Manage multiple versions of your MkDocs-powered documentation")
+    (license license:bsd-3)))
+
+(define-public python-arpeggio
+  (package
+    (name "python-arpeggio")
+    (version "1.10.2")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "Arpeggio" version))
+        (sha256
+          (base32
+            "1w86m86mvdlhkxg2fib03r2k26hx13az31mq9kc84bzqabr4kqxz"))))
+    (build-system python-build-system)
+    (native-inputs
+      `(("python-coverage" ,python-coverage)
+        ("python-coveralls" ,python-coveralls)
+        ("python-flake8" ,python-flake8)
+        ("python-mike" ,python-mike)
+        ("python-mkdocs" ,python-mkdocs)
+        ("python-pytest" ,python-pytest)
+        ("python-twine" ,python-twine)
+        ("python-wheel" ,python-wheel)))
+    (home-page "https://github.com/textX/Arpeggio")
+    (synopsis "Packrat parser interpreter")
+    (description "Packrat parser interpreter")
+    (license license:expat)))
+
+(define-public python-parver
+  (package
+    (name "python-parver")
+    (version "0.3.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "parver" version))
+        (sha256
+          (base32
+            "1lyzqp8bz0n2kzabzl7k7g7cn90rlnrxjzva2p62gsfc7djy00n9"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-arpeggio" ,python-arpeggio)
+        ("python-attrs" ,python-attrs)
+        ("python-six" ,python-six)))
+    (native-inputs
+      `(("python-doc8" ,python-doc8)
+        ("python-flake8" ,python-flake8)
+        ("python-hypothesis" ,python-hypothesis)
+        ("python-pep8-naming" ,python-pep8-naming)
+        ("python-pretend" ,python-pretend)
+        ("python-pytest" ,python-pytest)
+        ("python-sphinx" ,python-sphinx)
+        ("python-sphinx-rtd-theme"
+         ,python-sphinx-rtd-theme)))
+    (home-page "https://github.com/RazerM/parver")
+    (synopsis
+      "Parse and manipulate version numbers.")
+    (description
+      "Parse and manipulate version numbers.")
+    (license license:expat)))
+
+(define-public python-bs4
+  (package
+    (name "python-bs4")
+    (version "0.0.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "bs4" version))
+        (sha256
+          (base32
+            "0fnxhql23ql6q5n64xjknx3sc3fm4vgpbw0z99p0qp6cswgymv1n"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-beautifulsoup4" ,python-beautifulsoup4)))
+    (home-page
+      "https://pypi.python.org/pypi/beautifulsoup4")
+    (synopsis "A library for scraping information from web pages.")
+    (description "Beautiful Soup is a library that makes it easy to scrape information from web pages. It sits atop an HTML or XML parser, providing Pythonic idioms for iterating, searching, and modifying the parse tree.")
+    (license license:expat)))
+
+(define-public python-towncrier
+  (package
+    (name "python-towncrier")
+    (version "21.3.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "towncrier" version))
+        (sha256
+          (base32
+            "1znxavwsiy6czirjn0qi1p5yarnm7gg692nb0309hb6p4k4hpvbf"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-click" ,python-click)
+        ("python-click-default-group"
+         ,python-click-default-group)
+        ("python-incremental" ,python-incremental)
+        ("python-jinja2" ,python-jinja2)
+        ("python-toml" ,python-toml)))
+    (native-inputs
+      `(("python-packaging" ,python-packaging)))
+    (home-page
+      "https://github.com/hawkowl/towncrier")
+    (synopsis "Building newsfiles for your project.")
+    (description
+      "Building newsfiles for your project.")
+    (license license:expat)))
+
+(define-public python-virtualenv-clone
+  (package
+    (name "python-virtualenv-clone")
+    (version "0.5.6")
+    (source
+      (origin
+        (method git-fetch)
+        (uri 
+         (git-reference (url "https://github.com/edwardgeorge/virtualenv-clone")
+                        (commit version)))
+        (sha256
+          (base32
+            "0xb20fhl99dw5vnyb43sjpj9628nbdnwp5g7m8f2id7w8kpwzvfw"))))
+    (native-inputs
+     `(("python-pytest" ,python-pytest)
+       ("python-tox" ,python-tox)
+       ("python-virtualenv" ,python-virtualenv)))
+    (build-system python-build-system)    
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (add-before 'check 'configure-tox
+                    (lambda _
+                      (substitute* "tox.ini"
+                        (("(\\[testenv\\])" section-header)
+                          (string-append section-header 
+                                         "\npassenv = PYTHONPATH"))
+                        (("(\\[tox\\])" section-header)
+                          (string-append section-header 
+                                         "\nskip_missing_interpreters = true"))
+                        (("(commands = py.test -v) \\[\\]" _ cmd)
+                         (string-append cmd " tests")))
+                      #t)))))
+    (home-page
+     "https://github.com/edwardgeorge/virtualenv-clone")
+    (synopsis "script to clone virtualenvs.")
+    (description "script to clone virtualenvs.")
+    (license license:expat)))
+
+(define-public python-pipenv
+(package
+  (name "python-pipenv")
+  (version "2021.5.29")
+  (source
+    (origin
+      (method url-fetch)
+      (uri (pypi-uri "pipenv" version))
+      (sha256
+        (base32
+          "03p30vxn2qz0qgd7yc1mdnfcbm9dswmwsbsl4xmdxckhrnnqz585"))))
+  (build-system python-build-system)
+  (propagated-inputs
+    `(("python-certifi" ,python-certifi)
+      ("python-pip" ,python-pip)
+      ("python-setuptools" ,python-setuptools)
+      ("python-typing" ,python-typing)
+      ("python-virtualenv" ,python-virtualenv)
+      ("python-virtualenv-clone"
+       ,python-virtualenv-clone)))
+  (native-inputs
+    `(("python-black" ,python-black)
+      ("python-bs4" ,python-bs4)
+      ;("python-enum34" ,python-enum34)
+      ("python-pytest" ,python-pytest)
+      ("python-flake8" ,python-flake8)
+      ("python-flaky" ,python-flaky)
+      ("python-invoke" ,python-invoke)
+      ("python-mock" ,python-mock)
+      ("python-parver" ,python-parver)
+      ;("python-pytest" ,python-pytest)
+      ("python-pytest-timeout" ,python-pytest-timeout)
+      ("python-pytest-xdist" ,python-pytest-xdist)
+      ("python-sphinx" ,python-sphinx)
+      ("python-towncrier" ,python-towncrier)
+      ("python-twine" ,python-twine)))
+  (home-page "https://github.com/pypa/pipenv")
+  (synopsis
+    "Python Development Workflow for Humans.")
+  (description
+    "Python Development Workflow for Humans.")
+  (license license:expat)))
+
+(define-public python-fido2 
+  (package
+  (name "python-fido2")
+  (version "0.9.1")
+  (source
+    (origin
+      (method url-fetch)
+      (uri (pypi-uri "fido2" version))
+      (sha256
+        (base32
+          "0vpyknka7wa4jl1xhvhli48wk70dih7hm45kdrchf8wf4cjyx046"))))
+  (build-system python-build-system)
+  (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (invoke "pipenv" "run" "test")))))))
+  (propagated-inputs
+    `(("python-cryptography" ,python-cryptography)
+      ("python-six" ,python-six)))
+  (native-inputs 
+   `(("python-pipenv" ,python-pipenv)))
+  (home-page
+    "https://github.com/Yubico/python-fido2")
+  (synopsis "Python based FIDO 2.0 library")
+  (description "Python based FIDO 2.0 library")
+  (license '(license:bsd-2 license:asl2.0 license:mpl2.0))))
+
+(define-public python-onlykey-solo
+  (package
+    (name "python-onlykey-solo")
+    (version "0.0.28")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "onlykey-solo-python" version))
+       (sha256
+        (base32
+         "1xj1rzz6pqdsy0p2cr1vas3nw0l0ysxq6ww1hgiyb0cfim5bkf1i"))))
+    (build-system python-build-system)
+    (propagated-inputs
+     `(("python-click" ,python-click)
+       ("python-cryptography" ,python-cryptography)
+       ("python-ecdsa" ,python-ecdsa)
+       ("python-fido2" ,python-fido2)
+       ("python-intelhex" ,python-intelhex)
+       ("python-pyserial" ,python-pyserial)
+       ("python-pyusb" ,python-pyusb)
+       ("python-requests" ,python-requests)))
+    (home-page
+     "https://github.com/trustcrypto/onlykey-solo-python")
+    (synopsis
+     "Python library for OnlyKey with Solo FIDO2")
+    (description
+     "Python library for OnlyKey with Solo FIDO2")
+    (license license:asl2.0)))
+
+(define-public python-onlykey
+  (package
+    (name "python-onlykey")
+    (version "1.2.5")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "onlykey" version))
+        (sha256
+          (base32
+            "0054ma1bccx4nxz2s5j50l6h6ilgi8i74hvcnjf9j5wgfs0zbypc"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-aenum" ,python-aenum)
+        ("python-cython" ,python-cython)
+        ("python-ecdsa" ,python-ecdsa)
+        ("python-hidapi" ,python-hidapi)
+        ("python-onlykey-solo"
+         ,python-onlykey-solo)
+        ("python-prompt-toolkit" ,python-prompt-toolkit)
+        ("python-pynacl" ,python-pynacl)
+        ("python-six" ,python-six)))
+    (inputs `(("libusb", libusb)))
+    (home-page
+      "https://github.com/trustcrypto/python-onlykey")
+    (synopsis "OnlyKey client and command-line tool")
+    (description
+      "OnlyKey client and command-line tool")
+    (license license:expat)))
+
