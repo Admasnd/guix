@@ -976,7 +976,7 @@ Alternatively the menu can be bound globally, for example:
 (define-public emacs-moody
   (package
     (name "emacs-moody")
-    (version "0.5.5")
+    (version "0.6.0")
     (source
      (origin
        (method git-fetch)
@@ -985,7 +985,7 @@ Alternatively the menu can be bound globally, for example:
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0b4kg4dxy4ywwin96vz6x3rpvgr718y5rgrdarmwym9wv1qz0a0c"))))
+        (base32 "14x3hd0z0nh0dyfi434vqywi7aawfxhlqj6sp7m17np56zq32yhi"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/tarsius/moody")
     (synopsis "Tabs and ribbons for Emacs mode-line")
@@ -2613,14 +2613,14 @@ as a library for other Emacs packages.")
 (define-public emacs-auctex
   (package
     (name "emacs-auctex")
-    (version "13.0.13")
+    (version "13.0.14")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://elpa.gnu.org/packages/"
                            "auctex-" version ".tar"))
        (sha256
-        (base32 "06cb9jphqd0nysc60b4x24zmdryljb168cw66adl7b2x7sdzpkmn"))))
+        (base32 "1gmqdcg9s6xf8kvzh1j27nbimakd5cy8pwsn0il19l026kxjimr8"))))
     (build-system emacs-build-system)
     ;; We use 'emacs' because AUCTeX requires dbus at compile time
     ;; ('emacs-minimal' does not provide dbus).
@@ -3442,7 +3442,7 @@ restore the saved place.")
 (define-public emacs-dash
   (package
     (name "emacs-dash")
-    (version "2.19.0")
+    (version "2.19.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -3451,7 +3451,7 @@ restore the saved place.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0wycrcl79mv253vzf2y92qz9i52mi5xa82f9i4rgnqa02f2m633h"))))
+                "0z6f8y1m9amhg427iz1d4xcyr6n0kj5w7kmiz134p320ixsdnzd8"))))
     (build-system emacs-build-system)
     (arguments `(#:tests? #t))
     (home-page "https://github.com/magnars/dash.el")
@@ -3484,21 +3484,20 @@ type, for example: packages, buffers, files, etc.")
     (license license:gpl3+)))
 
 (define-public emacs-guix
-  (let ((commit "8ce6d219e87c5097abff9ce6f1f5a4293cdfcb31")
-        (revision "4"))
+  (let ((commit "c9aef52121b458297e70bb50f49f7276b4a8d759")
+        (revision "5"))
     (package
       (name "emacs-guix")
       (version (git-version "0.5.2" revision commit))
       (source (origin
                 (method git-fetch)
                 (uri (git-reference
-                      ;; TODO: Use the official version when it has a new home
-                      (url "https://github.com/alezost/guix.el")
+                      (url "https://gitlab.com/emacs-guix/emacs-guix.git")
                       (commit commit)))
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "0awbd8x154c4dk4av7inpgd63n07xzng84vvc8qckmgljknc0j7k"))))
+                  "00xdxadbi9fxpfp60zah9190rcz3w08vl1blbhmaiy7c1hd2gi39"))))
       (build-system gnu-build-system)
       (arguments
        `(#:modules ((guix build gnu-build-system)
@@ -3733,7 +3732,7 @@ kmonad's configuration files (@file{.kbd}).")
 (define-public emacs-keycast
   (package
     (name "emacs-keycast")
-    (version "1.1.0")
+    (version "1.1.1")
     (source
      (origin
        (method git-fetch)
@@ -3742,7 +3741,7 @@ kmonad's configuration files (@file{.kbd}).")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0093v1c5nl2bh1lvccqq6fzpgjald3yypp87dsim982aywl2vlv1"))))
+        (base32 "09xr0h2ag3pzlz455gv5h915vn1dz56gqx61jx3n7fc4a794pqxw"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/tarsius/keycast")
     (synopsis "Show current command and its key in the mode line")
@@ -3774,7 +3773,7 @@ a command.")
 (define-public emacs-olivetti
   (package
     (name "emacs-olivetti")
-    (version "2.0.1")
+    (version "2.0.2")
     (source
      (origin
        (method git-fetch)
@@ -3783,7 +3782,7 @@ a command.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0njkzd8x3wryyzd3czzk6f5w9jr7jly5l03ar706h77kpakd8z2y"))))
+        (base32 "0nx16w2d1wrqa5cgpbwqfy2al49b9nx2pr9zygiz5qa8jdlzw86l"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/rnkn/olivetti")
     (synopsis "Emacs minor mode for a nice writing environment")
@@ -3794,15 +3793,19 @@ in the center.")
 (define-public emacs-undo-tree
   (package
     (name "emacs-undo-tree")
-    (version "0.7.5")
+    (version "0.8.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (string-append "https://elpa.gnu.org/packages/"
-                           "undo-tree-" version ".el"))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.com/tsc25/undo-tree")
+             (commit (string-append "release/" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "00admi87gqm0akhfqm4dcp9fw8ihpygy030955jswkha4zs7lw2p"))))
+        (base32 "1khkwrrbwaimspc013n4k9mpv8g302r0zkrsqnza2x1d3qznn08y"))))
     (build-system emacs-build-system)
+    (propagated-inputs
+     `(("emacs-queue" ,emacs-queue)))
     (home-page "https://www.dr-qubit.org/undo-tree.html")
     (synopsis "Treat undo history as a tree")
     (description
@@ -7418,27 +7421,25 @@ Cucumber tool) user stories.  Also known by the name @code{cucumber.el}.")
     (license license:gpl3+)))
 
 (define-public emacs-org-appear
-  (let ((commit "19ea96e6e2ce01b8583b25a6e5579f1be207a119")
-        (revision "1"))
-    (package
-      (name "emacs-org-appear")
-      (version (git-version "0.0.1" revision commit)) ;no upstream release
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/awth13/org-appear")
-                      (commit commit)))
-                (file-name (git-file-name name version))
-                (sha256
-                 (base32
-                  "064kdb3z4zr9sa7qi5921cqh8vj226ifl8x1bkc59qd9a1p34ghd"))))
-      (build-system emacs-build-system)
-      (home-page "https://github.com/awth13/org-appear")
-      (synopsis "Make invisible parts of Org fragments appear visible")
-      (description "This package enables automatic visibility toggling of
+  (package
+    (name "emacs-org-appear")
+    (version "0.2.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/awth13/org-appear")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0sfz8rpvc9hidjj81wlc48vi7ii90mssgvfnp2z215phv67npbzp"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/awth13/org-appear")
+    (synopsis "Make invisible parts of Org fragments appear visible")
+    (description "This package enables automatic visibility toggling of
 org-mode elements depending on cursor position.  Hidden fragment parts appear
 when the cursor enters a fragment and disappear when it leaves.")
-      (license license:expat))))
+    (license license:expat)))
 
 (define-public emacs-org-drill
   (package
@@ -7496,7 +7497,7 @@ cards created in Org mode.")
 (define-public emacs-org-mime
   (package
     (name "emacs-org-mime")
-    (version "0.2.1")
+    (version "0.2.2")
     (source
      (origin
        (method git-fetch)
@@ -7505,7 +7506,7 @@ cards created in Org mode.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0vchyd80ybvr6317dwm50nxcgxfrpc0bz6259vnrh24p5sb8shbj"))))
+        (base32 "0gvir8c8b2m5z784ml5h957f7mxgp3vn7v91p6igaq5bjf5xcfpp"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/org-mime/org-mime")
     (synopsis "Send HTML email using Org mode HTML export")
@@ -10211,7 +10212,7 @@ with Elfeed.")
 (define-public emacs-elfeed-score
   (package
     (name "emacs-elfeed-score")
-    (version "0.7.10")
+    (version "0.8.4")
     (source
      (origin
        (method git-fetch)
@@ -10220,7 +10221,7 @@ with Elfeed.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "15gjsp4whrdw9yx3mw1517wfynv9yya5yhalqqdb738q5c32p9lm"))))
+        (base32 "1whf7nxfpb003wk9v15ib4xy1a7dfygdkg7jf3ly5z5l81607ap8"))))
     (build-system emacs-build-system)
     (propagated-inputs
      `(("emacs-elfeed" ,emacs-elfeed)))
@@ -13507,7 +13508,7 @@ to the home page or read the comments in the source file,
 (define-public emacs-htmlize
   (package
     (name "emacs-htmlize")
-    (version "1.55")
+    (version "1.56")
     (source
      (origin
        (method git-fetch)
@@ -13516,7 +13517,7 @@ to the home page or read the comments in the source file,
              (commit (string-append "release/" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0gi3xshscpa53qrj8yplfsqahcilc2ybcc2p7gnh5nbnf2n1n97x"))))
+        (base32 "14m8si49br62lgx7asdyp9jysq0v6midrfk32sxy521ydqmqr3c1"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/hniksic/emacs-htmlize")
     (synopsis "Convert buffer text and decorations to HTML")
@@ -15080,10 +15081,31 @@ query them from the comfort of your editor.")
     (home-page "https://github.com/hrs/engine-mode")
     (license license:gpl3+)))
 
+(define-public emacs-inheritenv
+  (package
+    (name "emacs-inheritenv")
+    (version "0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/purcell/inheritenv")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0ygzf70vfb7qwpsllcq5i3brprsnx3sxy2zng02mzwrr5jkx4ypc"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/purcell/inheritenv/releases")
+    (synopsis "Emacs temp buffers inherit buffer-local environment variables")
+    (description
+     "Inheritenv provides tools to execute processes inheriting the calling
+buffer's environment.")
+    (license license:gpl3+)))
+
 (define-public emacs-envrc
   (package
     (name "emacs-envrc")
-    (version "0.2")
+    (version "0.4")
     (source
      (origin
        (method git-fetch)
@@ -15093,8 +15115,10 @@ query them from the comfort of your editor.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0ssf9i6iym2rb530k2w5aj392qa73i6p5y0vwrs5qhkv9lagqq7p"))))
+         "0nqqx4qlw75lmbn0v927sg3xyjkk86ihw1q3rdbbn59va41grds4"))))
     (build-system emacs-build-system)
+    (propagated-inputs
+     `(("emacs-inheritenv" ,emacs-inheritenv)))
     (home-page "https://github.com/purcell/envrc")
     (synopsis "Support for Direnv which operates buffer-locally")
     (description
@@ -18689,37 +18713,34 @@ their meaning for the current Emacs major-mode.")
     (license license:gpl3+)))
 
 (define-public emacs-org-ref
-  ;; No release since June 2017.
-  (let ((commit "5bb9be2232db72b04754d7e4c02a3976ad422f6f")
-        (revision "2"))
-    (package
-      (name "emacs-org-ref")
-      (version (git-version "1.1.1" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/jkitchin/org-ref")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "15gcvbfj19kyv4nxa632b261dwhb26m99plq230qhv9ssfwfgxbx"))))
-      (build-system emacs-build-system)
-      (propagated-inputs
-       `(("emacs-dash" ,emacs-dash)
-         ("emacs-f" ,emacs-f)
-         ("emacs-helm" ,emacs-helm)
-         ("emacs-helm-bibtex" ,emacs-helm-bibtex)
-         ("emacs-htmlize" ,emacs-htmlize)
-         ("emacs-hydra" ,emacs-hydra)
-         ("emacs-ivy" ,emacs-ivy)
-         ("emacs-key-chord" ,emacs-key-chord)
-         ("emacs-pdf-tools" ,emacs-pdf-tools)
-         ("emacs-s" ,emacs-s)))
-      (home-page "https://github.com/jkitchin/org-ref")
-      (synopsis "Citations, cross-references and bibliographies in Org mode")
-      (description
-       "Org Ref is an Emacs library that provides rich support for citations,
+  (package
+    (name "emacs-org-ref")
+    (version "2.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/jkitchin/org-ref")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0xd1qp8dfy8n8b2n3rsdzm8vrfl7dii142kw330s8jp3pavww1f6"))))
+    (build-system emacs-build-system)
+    (propagated-inputs
+     `(("emacs-dash" ,emacs-dash)
+       ("emacs-f" ,emacs-f)
+       ("emacs-helm" ,emacs-helm)
+       ("emacs-helm-bibtex" ,emacs-helm-bibtex)
+       ("emacs-htmlize" ,emacs-htmlize)
+       ("emacs-hydra" ,emacs-hydra)
+       ("emacs-ivy" ,emacs-ivy)
+       ("emacs-key-chord" ,emacs-key-chord)
+       ("emacs-pdf-tools" ,emacs-pdf-tools)
+       ("emacs-s" ,emacs-s)))
+    (home-page "https://github.com/jkitchin/org-ref")
+    (synopsis "Citations, cross-references and bibliographies in Org mode")
+    (description
+     "Org Ref is an Emacs library that provides rich support for citations,
 labels and cross-references in Org mode.
 
 The basic idea of Org Ref is that it defines a convenient interface to insert
@@ -18737,7 +18758,7 @@ a DOI.
 Org Ref is especially suitable for Org documents destined for LaTeX export and
 scientific publication.  Org Ref is also useful for research documents and
 notes.")
-      (license license:gpl3+))))
+    (license license:gpl3+)))
 
 (define-public emacs-org-reveal
   (let ((commit "84039bb499290926511b04749882ecb5eda45a0c"))
@@ -23323,7 +23344,7 @@ recursively.  The results are cached for speed.")
 (define-public emacs-orgit
   (package
     (name "emacs-orgit")
-    (version "1.7.0")
+    (version "1.7.1")
     (home-page "https://github.com/magit/orgit")
     (source (origin
               (method git-fetch)
@@ -23333,7 +23354,7 @@ recursively.  The results are cached for speed.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1xd58yqqsb79lgxkhxs4s50jq8f3639k6fhlza9hsy53apfczkal"))))
+                "0mbcr98xq3zim01dk1fbyc1vajnjwx90k62mygv343rhrd05v44m"))))
     (build-system emacs-build-system)
     (propagated-inputs
      `(("emacs-dash" ,emacs-dash)
@@ -25863,14 +25884,14 @@ federated microblogging social network.")
 (define-public emacs-ebdb
   (package
     (name "emacs-ebdb")
-    (version "0.7.1")
+    (version "0.8.2")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://elpa.gnu.org/packages/"
                            "ebdb-" version ".tar"))
        (sha256
-        (base32 "1z5lh1mib60mvs5kbdsrw2h4whz4n5ad4qkpphs2xjvaz92jgq6s"))))
+        (base32 "1idwih5v287q9vdhsnr1bsibdv4h61vmy3b82svf2x9aik1a7vir"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/girzel/ebdb")
     (synopsis "EIEIO port of BBDB, Emacs's contact-management package")
@@ -28145,7 +28166,7 @@ snippets for Emacs.")
 (define-public emacs-org-roam
   (package
     (name "emacs-org-roam")
-    (version "2.0.0")
+    (version "2.1.0")
     (source
      (origin
        (method git-fetch)
@@ -28154,7 +28175,7 @@ snippets for Emacs.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mslrdgd41czay3w7znz4qsv1h0p3zqfsq6bkyxmxfyd2w5z82zf"))))
+        (base32 "092xn0sqc7b7f6pdf7m6c3giqqbh6fq02mfz8qrg0wmx4ds1isqp"))))
     (build-system emacs-build-system)
     (arguments
      `(#:phases
@@ -29166,6 +29187,18 @@ and preferred services can easily be configured.")
        (sha256
         (base32 "0rddk76ih44b574lsr6d6r9wa2l7c9zlb9kcyw5xvly17ciiq16h"))))
     (build-system emacs-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         ;; Move the extensions source files to the top level, which is included in
+         ;; the EMACSLOADPATH.
+         (add-after 'unpack 'move-source-files
+           (lambda _
+             (let ((el-files (find-files "./extensions" ".*\\.el$")))
+               (for-each (lambda (f)
+                           (rename-file f (basename f)))
+                         el-files))
+             #t)))))
     (native-inputs
      `(("texinfo" ,texinfo)))
     (home-page "https://github.com/minad/vertico")

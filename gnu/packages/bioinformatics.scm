@@ -4583,7 +4583,7 @@ The main functions of FastQC are:
 (define-public fastp
   (package
     (name "fastp")
-    (version "0.14.1")
+    (version "0.20.1")
     (source
      (origin
        (method git-fetch)
@@ -4593,19 +4593,18 @@ The main functions of FastQC are:
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1r6ms5zbf5rps4rgp4z73nczadl00b5rqylw8f684isfz27dp0xh"))))
+         "0ly8mxdvrcy23jwxyppysx3dhb1lwsqhfbgpyvargxhfk6k700x4"))))
     (build-system gnu-build-system)
     (arguments
      `(#:tests? #f ; there are none
        #:make-flags
-       (list (string-append "BINDIR=" (assoc-ref %outputs "out") "/bin"))
+       (list (string-append "PREFIX=" (assoc-ref %outputs "out")))
        #:phases
        (modify-phases %standard-phases
          (delete 'configure)
          (add-before 'install 'create-target-dir
            (lambda* (#:key outputs #:allow-other-keys)
-             (mkdir-p (string-append (assoc-ref outputs "out") "/bin"))
-             #t)))))
+             (mkdir-p (string-append (assoc-ref outputs "out") "/bin")))))))
     (inputs
      `(("zlib" ,zlib)))
     (home-page "https://github.com/OpenGene/fastp/")
@@ -14273,6 +14272,32 @@ sequencing (e.g. mapping or base/indel alignment uncertainty), which are
 usually ignored by other methods or only used for filtering.")
     (license license:expat)))
 
+(define-public ivar
+  (package
+    (name "ivar")
+    (version "1.3.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/andersen-lab/ivar")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "044xa0hm3b8fga64csrdx05ih8w7kwmvcdrdrhkg8j11ml4bi4xv"))))
+    (build-system gnu-build-system)
+    (inputs
+     `(("htslib" ,htslib)
+       ("zlib" ,zlib)))
+    (native-inputs
+     `(("autoconf" ,autoconf)
+       ("automake" ,automake)))
+    (home-page "https://andersen-lab.github.io/ivar/html/")
+    (synopsis "Tools for amplicon-based sequencing")
+    (description "iVar is a computational package that contains functions
+broadly useful for viral amplicon-based sequencing. ")
+    (license license:gpl3+)))
+
 (define-public python-pyliftover
   (package
     (name "python-pyliftover")
@@ -14748,6 +14773,28 @@ produced by Oxford Nanopore Technologies’ MinION, GridION or PromethION
 instruments, or Pacific Biosciences RSII or Sequel sequencers.")
    (license license:expat)))
 
+(define-public python-strawc
+  (package
+    (name "python-strawc")
+    (version "0.0.2.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "strawC" version))
+       (sha256
+        (base32
+         "1z1gy8n56lhriy6hdkh9r82ndikndipq2cy2wh8q185qig4rimr6"))))
+    (build-system python-build-system)
+    (inputs
+     `(("curl" ,curl)
+       ("pybind11" ,pybind11)
+       ("zlib" ,zlib)))
+    (home-page "https://github.com/aidenlab/straw")
+    (synopsis "Stream data from .hic files")
+    (description "Straw is library which allows rapid streaming of contact
+data from @file{.hic} files.  This package provides Python bindings.")
+    (license license:expat)))
+
 (define-public r-ascat
   (package
    (name "r-ascat")
@@ -14878,3 +14925,42 @@ copy number estimation, as described by
 integration, exploration, and analysis of high-dimensional single-cell
 cytometry and imaging data.")
       (license license:expat))))
+
+(define-public r-cytonorm
+  (let ((commit "e4b9d343ee65db3c422800f1db3e77c25abde987")
+        (revision "1"))
+    (package
+      (name "r-cytonorm")
+      (version (git-version "0.0.7" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/saeyslab/CytoNorm")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "0h2rdy15i4zymd4dv60n5w0frbsdbmzpv99dgm0l2dn041qv7fah"))))
+      (properties `((upstream-name . "CytoNorm")))
+      (build-system r-build-system)
+      (propagated-inputs
+       `(("r-cytoml" ,r-cytoml)
+         ("r-dplyr" ,r-dplyr)
+         ("r-emdist" ,r-emdist)
+         ("r-flowcore" ,r-flowcore)
+         ("r-flowsom" ,r-flowsom)
+         ("r-flowworkspace" ,r-flowworkspace)
+         ("r-ggplot2" ,r-ggplot2)
+         ("r-gridextra" ,r-gridextra)
+         ("r-pheatmap" ,r-pheatmap)
+         ("r-stringr" ,r-stringr)))
+      (home-page "https://github.com/saeyslab/CytoNorm")
+      (synopsis "Normalize cytometry data measured across multiple batches")
+      (description
+       "This package can be used to normalize cytometry samples when a control
+sample is taken along in each of the batches.  This is done by first
+identifying multiple clusters/cell types, learning the batch effects from the
+control samples and applying quantile normalization on all markers of
+interest.")
+      (license license:gpl2+))))
