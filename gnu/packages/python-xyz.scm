@@ -26510,31 +26510,43 @@ graph can be output for rendering by GraphViz or yEd.")
   (version "2021.5.29")
   (source
     (origin
-      (method url-fetch)
-      (uri (pypi-uri "pipenv" version))
+      (method git-fetch)
+       (uri
+        (git-reference
+         (url "https://github.com/pypa/pipenv")
+         (commit
+          (string-append "v" version))))
       (sha256
         (base32
-          "03p30vxn2qz0qgd7yc1mdnfcbm9dswmwsbsl4xmdxckhrnnqz585"))))
+         "10a0vq4g5jha9xm9rbyq6p05pgc8yk63s8gi66cxwwfsmrfwiigr"))))
   (build-system python-build-system)
+  (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (invoke "make" "-d" "test")))))))
   (propagated-inputs
-    `(("python-certifi" ,python-certifi)
+    `(("docker-compose" ,docker-compose)
+      ("python-certifi" ,python-certifi)
       ("python-pip" ,python-pip)
       ("python-setuptools" ,python-setuptools)
-      ("python-typing" ,python-typing)
+      ; ("python-typing" ,python-typing)
       ("python-virtualenv" ,python-virtualenv)
       ("python-virtualenv-clone"
        ,python-virtualenv-clone)))
   (native-inputs
     `(("python-black" ,python-black)
       ("python-bs4" ,python-bs4)
-      ;("python-enum34" ,python-enum34)
+      ; ("python-enum34" ,python-enum34)
       ("python-pytest" ,python-pytest)
       ("python-flake8" ,python-flake8)
       ("python-flaky" ,python-flaky)
       ("python-invoke" ,python-invoke)
       ("python-mock" ,python-mock)
       ("python-parver" ,python-parver)
-      ;("python-pytest" ,python-pytest)
+      ("python-pytest" ,python-pytest)
       ("python-pytest-timeout" ,python-pytest-timeout)
       ("python-pytest-xdist" ,python-pytest-xdist)
       ("python-sphinx" ,python-sphinx)
