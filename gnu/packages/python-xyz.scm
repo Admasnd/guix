@@ -26311,7 +26311,12 @@ graph can be output for rendering by GraphViz or yEd.")
         (uri (pypi-uri "verspec" version))
         (sha256
           (base32
-            "07n06wv85fm4vl1ird2mja0823js3x322wgs9gdnq1djjyk4ql64"))))
+            "07n06wv85fm4vl1ird2mja0823js3x322wgs9gdnq1djjyk4ql64"))
+        (modules '((guix build utils)))
+        (snippet
+        '(with-directory-excursion "test"
+           (with-output-to-file "__init__.py"
+             (lambda () (newline)))))))
     (build-system python-build-system)
     (native-inputs
       `(("python-coverage" ,python-coverage)
