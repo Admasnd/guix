@@ -26316,7 +26316,7 @@ graph can be output for rendering by GraphViz or yEd.")
         (snippet
         '(with-directory-excursion "test"
            (with-output-to-file "__init__.py"
-             (lambda () (newline)))))))
+             newline)))))
     (build-system python-build-system)
     (native-inputs
       `(("python-coverage" ,python-coverage)
