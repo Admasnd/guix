@@ -26529,60 +26529,60 @@ graph can be output for rendering by GraphViz or yEd.")
       "Easily test your HTTP library against a local copy of pypi")
     (license license:expat)))
 
-(define-public python-pipenv
-(package
-  (name "python-pipenv")
-  (version "2021.5.29")
-  (source
-    (origin
-      (method git-fetch)
-       (uri
-        (git-reference
-         (url "https://github.com/pypa/pipenv")
-         (commit
-          (string-append "v" version))))
-      (sha256
-        (base32
-         "10a0vq4g5jha9xm9rbyq6p05pgc8yk63s8gi66cxwwfsmrfwiigr"))))
-  (build-system python-build-system)
-  (arguments
-     '(#:phases
-       (modify-phases %standard-phases
-         (replace 'check
-           (lambda* (#:key tests? #:allow-other-keys)
-             (when tests?
-               (invoke "make" "test")))))))
-  (propagated-inputs
-    `(("docker-compose" ,docker-compose)
-      ("python-certifi" ,python-certifi)
-      ("python-pip" ,python-pip)
-      ("python-setuptools" ,python-setuptools)
-      ; ("python-typing" ,python-typing)
-      ("python-virtualenv" ,python-virtualenv)
-      ("python-virtualenv-clone" ,python-virtualenv-clone)))
-  (native-inputs
-    `(("python-black" ,python-black)
-      ("python-bs4" ,python-bs4)
-      ("python-pytest-pypi" ,python-pytest-pypi)
-      ; ("python-enum34" ,python-enum34)
-      ("python-pytest" ,python-pytest)
-      ("python-flake8" ,python-flake8)
-      ("python-flaky" ,python-flaky)
-      ("python-invoke" ,python-invoke)
-      ("python-mock" ,python-mock)
-      ("python-parver" ,python-parver)
-      ("python-pytest" ,python-pytest)
-      ("python-pytest-timeout" ,python-pytest-timeout)
-      ("python-pytest-xdist" ,python-pytest-xdist)
-      ("python-sphinx" ,python-sphinx)
-      ("python-towncrier" ,python-towncrier)
-      ("python-twine" ,python-twine)))
-  (home-page "https://github.com/pypa/pipenv")
-  (synopsis
-    "Python Development Workflow for Humans.")
-  (description
-    "Python Development Workflow for Humans.")
-  (license license:expat)))
+;; (define-public python-pipenv
+;;   (package
+;;     (name "python-pipenv")
+;;     (version "2021.5.29")
+;;     (source
+;;      (origin
+;;        (method git-fetch)
+;;        (uri
+;;         (git-reference
+;;          (url "https://github.com/pypa/pipenv")
+;;          (commit
+;;           (string-append "v" version))))
+;;        (sha256
+;;         (base32
+;;          "10a0vq4g5jha9xm9rbyq6p05pgc8yk63s8gi66cxwwfsmrfwiigr"))))
+;;     (build-system python-build-system)
+;;     (arguments
+;;      '(#:phases
+;;        (modify-phases %standard-phases
+;;          (replace 'check
+;;            (lambda* (#:key tests? #:allow-other-keys)
+;;              (when tests?
+;;                (invoke "make" "test")))))))
+;;     (propagated-inputs
+;;      `(("docker-compose" ,docker-compose)
+;;        ("python-certifi" ,python-certifi)
+;;        ("python-pip" ,python-pip)
+;;        ("python-setuptools" ,python-setuptools)
+;;                                         ; ("python-typing" ,python-typing)
+;;        ("python-virtualenv" ,python-virtualenv)
+;;        ("python-virtualenv-clone" ,python-virtualenv-clone)))
+;;     (native-inputs
+;;      `(("python-black" ,python-black)
+;;        ("python-bs4" ,python-bs4)
+;;        ("python-pytest-pypi" ,python-pytest-pypi)
+;;                                         ; ("python-enum34" ,python-enum34)
+;;        ("python-pytest" ,python-pytest)
+;;        ("python-flake8" ,python-flake8)
+;;        ("python-flaky" ,python-flaky)
+;;        ("python-invoke" ,python-invoke)
+;;        ("python-mock" ,python-mock)
+;;        ("python-parver" ,python-parver)
+;;        ("python-pytest" ,python-pytest)
+;;        ("python-pytest-timeout" ,python-pytest-timeout)
+;;        ("python-pytest-xdist" ,python-pytest-xdist)
+;;        ("python-sphinx" ,python-sphinx)
+;;        ("python-towncrier" ,python-towncrier)
+;;        ("python-twine" ,python-twine)))
+;;     (home-page "https://github.com/pypa/pipenv")
+;;     (synopsis
+;;      "Python Development Workflow for Humans.")
+;;     (description
+;;      "Python Development Workflow for Humans.")
+;;     (license license:expat)))
 
 (define-public python-fido2 
   (package
@@ -26602,12 +26602,12 @@ graph can be output for rendering by GraphViz or yEd.")
          (replace 'check
            (lambda* (#:key tests? #:allow-other-keys)
              (when tests?
-               (invoke "pipenv" "run" "test")))))))
+               (invoke "python" "-m" "unittest" "discover")))))))
   (propagated-inputs
     `(("python-cryptography" ,python-cryptography)
       ("python-six" ,python-six)))
   (native-inputs 
-   `(("python-pipenv" ,python-pipenv)))
+   `(("python-mock" ,python-mock)))
   (home-page
     "https://github.com/Yubico/python-fido2")
   (synopsis "Python based FIDO 2.0 library")
