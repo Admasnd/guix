@@ -26504,6 +26504,31 @@ graph can be output for rendering by GraphViz or yEd.")
     (description "script to clone virtualenvs.")
     (license license:expat)))
 
+(define-public python-pytest-pypi
+  (package
+    (name "python-pytest-pypi")
+    (version "0.1.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "pytest-pypi" version))
+        (sha256
+          (base32
+            "0gl8x2vsy17lrhamnd2znlihxyc6b036dzvs7qpkpdbphzlg58jd"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-flask" ,python-flask)
+        ("python-six" ,python-six)))
+    (native-inputs
+     `(("python-pytest" ,python-pytest)))
+    (home-page
+      "https://github.com/kennethreitz/pytest-pypi")
+    (synopsis
+      "Easily test your HTTP library against a local copy of pypi")
+    (description
+      "Easily test your HTTP library against a local copy of pypi")
+    (license license:expat)))
+
 (define-public python-pipenv
 (package
   (name "python-pipenv")
@@ -26526,7 +26551,7 @@ graph can be output for rendering by GraphViz or yEd.")
          (replace 'check
            (lambda* (#:key tests? #:allow-other-keys)
              (when tests?
-               (invoke "make" "-d" "test")))))))
+               (invoke "make" "test")))))))
   (propagated-inputs
     `(("docker-compose" ,docker-compose)
       ("python-certifi" ,python-certifi)
@@ -26534,11 +26559,11 @@ graph can be output for rendering by GraphViz or yEd.")
       ("python-setuptools" ,python-setuptools)
       ; ("python-typing" ,python-typing)
       ("python-virtualenv" ,python-virtualenv)
-      ("python-virtualenv-clone"
-       ,python-virtualenv-clone)))
+      ("python-virtualenv-clone" ,python-virtualenv-clone)))
   (native-inputs
     `(("python-black" ,python-black)
       ("python-bs4" ,python-bs4)
+      ("python-pytest-pypi" ,python-pytest-pypi)
       ; ("python-enum34" ,python-enum34)
       ("python-pytest" ,python-pytest)
       ("python-flake8" ,python-flake8)
