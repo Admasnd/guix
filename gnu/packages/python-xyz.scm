@@ -26626,6 +26626,8 @@ graph can be output for rendering by GraphViz or yEd.")
         (base32
          "1xj1rzz6pqdsy0p2cr1vas3nw0l0ysxq6ww1hgiyb0cfim5bkf1i"))))
     (build-system python-build-system)
+    (arguments
+     `(#:tests? #f))
     (propagated-inputs
      `(("python-click" ,python-click)
        ("python-cryptography" ,python-cryptography)
