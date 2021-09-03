@@ -26471,6 +26471,10 @@ graph can be output for rendering by GraphViz or yEd.")
     (version "0.5.6")
     (source
       (origin
+        ; Github being used instead of pypi because tarball in pypi is missing tox.ini.
+        ; This file is necessary to run check phase.
+        ; More on this issue can be found at following url.   
+        ; https://github.com/edwardgeorge/virtualenv-clone/issues/71
         (method git-fetch)
         (uri 
          (git-reference (url "https://github.com/edwardgeorge/virtualenv-clone")
