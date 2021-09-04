@@ -567,7 +567,7 @@ other machines/servers.  Electrum does not download the Bitcoin blockchain.")
 (define-public electron-cash
   (package
     (name "electron-cash")
-    (version "4.2.4")
+    (version "4.2.5")
     (source
      (origin
        (method git-fetch)
@@ -576,7 +576,7 @@ other machines/servers.  Electrum does not download the Bitcoin blockchain.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1a4jqsfadv6xr7ydj79my71jyrp0sjlznsbxdxjsjgnsqk8r48w6"))))
+        (base32 "1fj797hbinxsqjwhh4l1vjsx1vzmgzf2apq7fnqqwpv9g0v2pch0"))))
     (build-system python-build-system)
     (inputs
      `(("libevent" ,libevent)
@@ -642,7 +642,7 @@ other machines/servers.  Electroncash does not download the Bitcoin Cash blockch
   ;; the system's dynamically linked library.
   (package
     (name "monero")
-    (version "0.17.2.0")
+    (version "0.17.2.3")
     (source
      (origin
        (method git-fetch)
@@ -662,7 +662,7 @@ other machines/servers.  Electroncash does not download the Bitcoin Cash blockch
               "external/unbound"))
            #t))
        (sha256
-        (base32 "0jwlmrpzisvw1c06cvd5b3s3hd4w0pa1qmrypfwah67qj3x6hnb6"))))
+        (base32 "0nax991fshfh51grhh2ryfrwwws35k16gzl1l3niva28zff2xmq6"))))
     (build-system cmake-build-system)
     (native-inputs
      `(("doxygen" ,doxygen)
@@ -752,7 +752,7 @@ the Monero command line client and daemon.")
 (define-public monero-gui
   (package
     (name "monero-gui")
-    (version "0.17.2.2")
+    (version "0.17.2.3")
     (source
      (origin
        (method git-fetch)
@@ -769,7 +769,7 @@ the Monero command line client and daemon.")
            (delete-file-recursively "monero")
            #t))
        (sha256
-        (base32 "0n7gfhm13y18ffqsqdajl4knd4h8m772fz6lh1lpkh198pwmw8f9"))))
+        (base32 "0qb746z1sxqrja7q9lqhhbm64v83sn67az4k7gs5q90iaw584qfc"))))
     (build-system qt-build-system)
     (native-inputs
      `(,@(package-native-inputs monero)
@@ -807,16 +807,11 @@ the Monero command line client and daemon.")
              (substitute* "src/version.js.in"
                (("@VERSION_TAG_GUI@")
                 ,version))
-             (substitute* "src/zxcvbn-c/makefile"
-               (("\\?=") "="))
              (substitute* "external/CMakeLists.txt"
                (("add_library\\(quirc" all)
                 (string-append
                  "set(CMAKE_C_FLAGS \"${CMAKE_C_FLAGS} -fPIC\")\n"
                  all)))))
-         (add-before 'configure 'generate-zxcvbn-c-header
-           (lambda _
-             (invoke "make" "-C" "src/zxcvbn-c" "dict-src.h")))
          (replace 'install
            (lambda* (#:key outputs #:allow-other-keys)
              (let ((bin (string-append (assoc-ref outputs "out") "/bin")))
@@ -1048,12 +1043,7 @@ the KeepKey Hardware Wallet.")
        ("python-trezor-agent" ,python-trezor-agent)))
     (home-page "https://github.com/romanz/trezor-agent")
     (synopsis "Ledger as hardware SSH/GPG agent")
-    (description "This package allows using Ledger as hardware SSH/GPG agent.
-
-Usage for SSH: trezor-agent foo@@example.com --connect
-Usage for GPG: Initialize using trezor-gpg init \"Foo <foo@@example.com>\"
-Then set the environment variable GNUPGHOME to
-\"${HOME}/.gnupg/trezor\".")
+    (description "This package allows using Ledger as hardware SSH/GPG agent.")
     (license license:lgpl3)))
 
 (define-public trezor-agent

@@ -845,7 +845,8 @@ doctest.")
     (description
      "Mock is a library for testing in Python.  It allows you to replace parts
 of your system under test with mock objects and make assertions about how they
-have been used.")
+have been used.  This library is now part of Python (since Python 3.3),
+available via the @code{unittest.mock} module.")
     (properties `((python2-variant . ,(delay python2-mock))))
     (license license:expat)))
 
@@ -1002,14 +1003,14 @@ and many external plugins.")
 (define-public python-pytest-6
   (package
     (inherit (strip-python2-variant python-pytest))
-    (version "6.1.2")
+    (version "6.2.4")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "pytest" version))
        (sha256
         (base32
-         "0gl2sdm322vzmsh5k4f8kj9raiq2y7kdinnca4m45ifvii5fk9y0"))))
+         "0jy5f83la1864ss42dhsi1mcm5nl79d8bjg7wk474nlw1c5avg2h"))))
     (arguments
      `(#:phases
        (modify-phases %standard-phases
@@ -1019,24 +1020,24 @@ and many external plugins.")
              (if tests?
                  (invoke "pytest" "-vv" "-k"
                          (string-append
-                          ;; This test involve the /usr directory, and fails.
+                          ;; This test involves the /usr directory, and fails.
                           " not test_argcomplete"
                           ;; These test do not honor the isatty detection and
                           ;; fail.
                           " and not test_code_highlight"
                           " and not test_color_yes"))
-                 (format #t "test suite not run~%"))
-             #t)))))
+                 (format #t "test suite not run~%")))))))
     (propagated-inputs
      (append (alist-delete "python-py"
                            (package-propagated-inputs python-pytest))
-             `(("python-py" ,python-py-next))))
+         `(("python-iniconfig" ,python-iniconfig)
+           ("python-py" ,python-py-next))))
     (native-inputs
-     (append (alist-delete "python-pytest"
-                           (package-native-inputs python-pytest))
-             `(("python-pytest" ,python-pytest-6-bootstrap)
-               ("python-toml" ,python-toml)
-               ("python-iniconfig" ,python-iniconfig))))))
+     (append (fold alist-delete (package-native-inputs python-pytest)
+                   '("python-mock"
+                     "python-pytest"))
+         `(("python-pytest" ,python-pytest-6-bootstrap)
+           ("python-toml" ,python-toml))))))
 
 ;; Pytest 4.x are the last versions that support Python 2.
 (define-public python2-pytest
@@ -1260,19 +1261,33 @@ contacting the real http server.")
 (define-public python-pytest-mock
   (package
     (name "python-pytest-mock")
-    (version "1.10.1")
+    (version "3.6.1")
     (source
-      (origin
-        (method url-fetch)
-        (uri (pypi-uri "pytest-mock" version))
-        (sha256
-         (base32
-          "1i5mg3ff1qk0wqfcxfz60hwy3q5dskdp36i10ckigkzffg8hc3ad"))))
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pytest-mock" version))
+       (sha256 (base32
+                "0qhfmd05z3g88bnwq6644jl6p5wy01i4yy7h8883z9jjih2pl8a0"))))
     (build-system python-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key inputs outputs tests? #:allow-other-keys)
+             (when tests?
+               (add-installed-pythonpath inputs outputs)
+               ;; Skip the assertion rewriting tests, which don't work in the
+               ;; presence of read-only Python modules (a limitation of
+               ;; Pytest).  Also skip the "test_standalone_mock" test, which
+               ;; can only work when 'python-mock' is not available
+               ;; (currently propagated by Pytest 5).
+               (invoke "pytest" "--assert=plain"
+                       "-k" "not test_standalone_mock")))))))
     (native-inputs
      `(("python-setuptools-scm" ,python-setuptools-scm)))
     (propagated-inputs
-     `(("python-pytest" ,python-pytest)))
+     `(("python-pytest" ,python-pytest)
+       ("python-pytest-asyncio" ,python-pytest-asyncio)))
     (home-page "https://github.com/pytest-dev/pytest-mock/")
     (synopsis "Thin-wrapper around the mock package for easier use with py.test")
     (description
@@ -1295,38 +1310,32 @@ same arguments.")
 (define-public python-pytest-xdist
   (package
     (name "python-pytest-xdist")
-    (version "2.1.0")
+    ;; There is an issue that causes all releases after 1.34 to fail on Pytest
+    ;; 5 (see: https://github.com/pytest-dev/pytest-xdist/issues/697).
+    (version "1.34.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "pytest-xdist" version))
        (sha256
         (base32
-         "0wh6pn66nncfs6ay0n863bgyriwsgppn8flx5l7551j1lbqkinc2"))
-       (modules '((guix build utils)))
-       (snippet
-        '(begin
-           ;; Remove pre-compiled .pyc files from source.
-           (for-each delete-file-recursively
-                     (find-files "." "__pycache__" #:directories? #t))
-           (for-each delete-file (find-files "." "\\.pyc$"))
-           #t))))
+         "1vh4ps32lp5ignch5adbl3pgchvigdfmrl6qpmhxih54wa1qw3il"))))
     (build-system python-build-system)
     (arguments
-     '(#:tests? #f)) ;FIXME: Some tests are failing.
-       ;; #:phases
-       ;; (modify-phases %standard-phases
-       ;;   (delete 'check)
-       ;;   (add-after 'install 'check
-       ;;     (lambda* (#:key inputs outputs #:allow-other-keys)
-       ;;       (add-installed-pythonpath inputs outputs)
-       ;;       (zero? (system* "py.test" "-v")))))
+     `(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key inputs outputs tests? #:allow-other-keys)
+             (when tests?
+               (add-installed-pythonpath inputs outputs)
+               (invoke "pytest" "-vv"
+                       "-n" (number->string (parallel-job-count)))))))))
     (native-inputs
      `(("python-setuptools-scm" ,python-setuptools-scm)))
     (propagated-inputs
      `(("python-execnet" ,python-execnet)
        ("python-pytest" ,python-pytest)
-       ("python-py" ,python-py)))
+       ("python-pytest-forked" ,python-pytest-forked)))
     (home-page
      "https://github.com/pytest-dev/pytest-xdist")
     (synopsis
@@ -1342,6 +1351,22 @@ result back.")
 
 (define-public python2-pytest-xdist
   (package-with-python2 python-pytest-xdist))
+
+(define-public python-pytest-xdist-next
+  (package/inherit python-pytest-xdist
+    (name "python-pytest-xdist")
+    (version "2.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pytest-xdist" version))
+       (sha256
+        (base32
+         "19cy57jrf3pwi7x6fnbxryjvqagsl0yv736jnynvr3yqhlpxxv78"))))
+    (propagated-inputs
+     `(("python-execnet" ,python-execnet)
+       ("python-pytest" ,python-pytest-6)
+       ("python-pytest-forked" ,python-pytest-forked)))))
 
 (define-public python-pytest-timeout
   (package
@@ -1377,26 +1402,45 @@ timeout has been exceeded.")
 (define-public python-pytest-forked
   (package
     (name "python-pytest-forked")
-    (version "1.1.3")
+    (version "1.3.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "pytest-forked" version))
+       (method git-fetch)               ;for tests
+       (uri (git-reference
+             (url "https://github.com/pytest-dev/pytest-forked")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
         (base32
-         "000i4q7my2fq4l49n8idx2c812dql97qv6qpm2vhrrn9v6g6j18q"))))
+         "1aip4kx50ynvykl7kq2mlbsi82vx701dvb8mm64lhp69bbv105rc"))))
     (build-system python-build-system)
-    (propagated-inputs
-     `(("python-pytest" ,python-pytest)))
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'disable-setuptools-scm
+           (lambda _
+             (substitute* "setup.py"
+               (("use_scm_version=True")
+                (format #f "version=~s" ,version))
+               (("setup_requires=\\['setuptools_scm'\\],.*")
+                ""))))
+         (replace 'check
+           (lambda* (#:key inputs outputs tests? #:allow-other-keys)
+             (when tests?
+               (add-installed-pythonpath inputs outputs)
+               (invoke "pytest" "-vv")))))))
     (native-inputs
-     `(("python-setuptools-scm" ,python-setuptools-scm)))
-    (home-page
-     "https://github.com/pytest-dev/pytest-forked")
-    (synopsis
-     "Run tests in isolated forked subprocesses")
-    (description
-     "Pytest plugin which will run each test in a subprocess and will report if
-a test crashed the process.")
+     ;; XXX: The bootstrap variant of Pytest is used to ensure the
+     ;; 'hypothesis' plugin is not in the environment (due to
+     ;; <http://issues.guix.gnu.org/25235>), which would cause the test suite
+     ;; to fail (see: https://github.com/pytest-dev/pytest-forked/issues/54).
+     `(("python-pytest" ,python-pytest-bootstrap)))
+    (home-page "https://github.com/pytest-dev/pytest-forked")
+    (synopsis "Pytest plugin to run tests in isolated forked subprocesses")
+    (description "This package provides a Pytest plugin which enables running
+each test in a subprocess and will report if a test crashed the process.  It
+can be useful to isolate tests against undesirable global environment
+side-effects (such as setting environment variables).")
     (license license:expat)))
 
 (define-public python-scripttest
@@ -1710,14 +1754,29 @@ executed.")
 (define-public python-pytest-asyncio
   (package
     (name "python-pytest-asyncio")
+    ;; Version 0.10.0 is the last version which is compatible with Pytest <=
+    ;; 5.4.0.
     (version "0.10.0")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "pytest-asyncio" version))
+       (method git-fetch)               ;for tests
+       (uri (git-reference
+             (url "https://github.com/pytest-dev/pytest-asyncio")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "1bysy4nii13bm7h345wxf8fxcjhab7l374pqdv7vwv3izl053b4z"))))
+        (base32
+         "1m63b7nbph5z20mn8jgh6j9ac873i1k4in29x44vrkw3qwfwg13y"))
+       (patches (search-patches "python-pytest-asyncio-python-3.8.patch"))))
     (build-system python-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key inputs outputs tests? #:allow-other-keys)
+             (when tests?
+               (add-installed-pythonpath inputs outputs)
+               (invoke "pytest" "-vv")))))))
     (native-inputs
      `(("python-coverage" ,python-coverage)
        ("python-async-generator" ,python-async-generator)

@@ -371,15 +371,15 @@ the same, being completely separated from the Internet.")
     ;; Track the ‘mainline’ branch.  Upstream considers it more reliable than
     ;; ’stable’ and recommends that “in general you deploy the NGINX mainline
     ;; branch at all times” (https://www.nginx.com/blog/nginx-1-6-1-7-released/)
-    ;; Consider updating the nginx-documentation package together with this one.
-    (version "1.21.0")
+    ;; Please update the nginx-documentation package together with this one!
+    (version "1.21.2")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://nginx.org/download/nginx-"
                                   version ".tar.gz"))
               (sha256
                (base32
-                "0w87zhm5nfx88x9hj6drrvm5f3m02kzbjp39x1lsglrbmi5jl6gy"))))
+                "11ail85iw6mg8fxd2qnxhcghi0frjk5r70cfar83dms61rb1qxri"))))
     (build-system gnu-build-system)
     (inputs `(("libxml2" ,libxml2)
               ("libxslt" ,libxslt)
@@ -474,9 +474,9 @@ and as a proxy to reduce the load on back-end HTTP or mail servers.")
 
 (define-public nginx-documentation
   ;; This documentation should be relevant for the current nginx package.
-  (let ((version "1.21.0")
-        (revision 2726)
-        (changeset "a7a36efd10af"))
+  (let ((version "1.21.2")
+        (revision 2764)
+        (changeset "bc9c5d11b67c"))
     (package
       (name "nginx-documentation")
       (version (simple-format #f "~A-~A-~A" version revision changeset))
@@ -488,7 +488,7 @@ and as a proxy to reduce the load on back-end HTTP or mail servers.")
                (file-name (string-append name "-" version))
                (sha256
                 (base32
-                 "1fl7rkbfdd26c78h85x4w3kas16rpj4pxzjhc071qvx7znwgm2pn"))))
+                 "05n72q9vqxx37dyw3yl7jssmpqkw3rwxa2y3m6s0c0ih0z2bx58n"))))
       (build-system gnu-build-system)
       (arguments
        '(#:tests? #f                    ; no test suite
@@ -1672,13 +1672,17 @@ used to validate and fix HTML data.")
            #t))))
     (build-system go-build-system)
     (arguments
-     '(#:import-path "github.com/evanw/esbuild/cmd/esbuild"
+     `(#:import-path "github.com/evanw/esbuild/cmd/esbuild"
        #:unpack-path "github.com/evanw/esbuild"
        #:phases
        (modify-phases %standard-phases
          (replace 'check
            (lambda* (#:key tests? unpack-path #:allow-other-keys)
              (when tests?
+               ;; The "Go Race Detector" is only supported on 64-bit
+               ;; platforms, this variable disables it.
+               (unless ,(target-64bit?)
+                 (setenv "ESBUILD_RACE" ""))
                (with-directory-excursion (string-append "src/" unpack-path)
                  (invoke "make" "test-go")))
              #t)))))

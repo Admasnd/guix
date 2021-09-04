@@ -357,15 +357,15 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 
 ;; The current "stable" kernels. That is, the most recently released major
 ;; versions that are still supported upstream.
-(define-public linux-libre-5.13-version "5.13.12")
+(define-public linux-libre-5.13-version "5.13.13")
 (define deblob-scripts-5.13
   (linux-libre-deblob-scripts
    linux-libre-5.13-version
-   (base32 "08xai5zqgk0y0rwhssf81lf8vivjg12wjkv7855l3ljkivgjclbf")
+   (base32 "0bdqgxpc2vnj6m1nnrw8l5jpdglm0nlvjl6g44xryhy230ds0p9l")
    (base32 "153jf5l5x4438zgxwggaky2ahjlfl48j438vhpzks6h77lzc51a5")))
 (define-public linux-libre-5.13-pristine-source
   (let ((version linux-libre-5.13-version)
-        (hash (base32 "0948w1zc2gqnl8x60chjqngfzdi0kcxm12i1nx3nx4ksiwj5vc98")))
+        (hash (base32 "0d1lr3rivgf9j3bn2a9hpzdf74nq8kybf3rfxxvw68vr1hhd4cam")))
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-5.13)))
@@ -373,7 +373,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 ;; The "longterm" kernels — the older releases with long-term upstream support.
 ;; Here are the support timelines:
 ;; <https://www.kernel.org/category/releases.html>
-(define-public linux-libre-5.10-version "5.10.60")
+(define-public linux-libre-5.10-version "5.10.61")
 (define deblob-scripts-5.10
   (linux-libre-deblob-scripts
    linux-libre-5.10-version
@@ -381,12 +381,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "0c9x07gplzajm0h5if3fpw2rvfb7psw3yp7i2n6ws7ggq1dvmki2")))
 (define-public linux-libre-5.10-pristine-source
   (let ((version linux-libre-5.10-version)
-        (hash (base32 "13gpamqj0shvad4nd9v11iv8qdfbjgb242nbvcim2z3c7xszfvv9")))
+        (hash (base32 "1lci78584c0rg5m5rkylssppnv001pzh4769m9mds4fdqn6f7sl2")))
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-5.10)))
 
-(define-public linux-libre-5.4-version "5.4.142")
+(define-public linux-libre-5.4-version "5.4.143")
 (define deblob-scripts-5.4
   (linux-libre-deblob-scripts
    linux-libre-5.4-version
@@ -394,12 +394,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1xghbbnaisjd0k1klbyn1p7r6r4x5a1bpmkm56a3gh2zvw4s7mj8")))
 (define-public linux-libre-5.4-pristine-source
   (let ((version linux-libre-5.4-version)
-        (hash (base32 "0l8l4cg04p5vx890jm45r35js1v0nljd0lp5qwkvlr45jql5fy4r")))
+        (hash (base32 "090x087p8hxnc1daf2xwj7vg8hg1jhz5i4andkbhdy550l5nalq9")))
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-5.4)))
 
-(define-public linux-libre-4.19-version "4.19.204")
+(define-public linux-libre-4.19-version "4.19.205")
 (define deblob-scripts-4.19
   (linux-libre-deblob-scripts
    linux-libre-4.19-version
@@ -407,12 +407,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1jiaw0as1ippkrjdpd52657w5mz9qczg3y2hlra7m9k0xawwiqlf")))
 (define-public linux-libre-4.19-pristine-source
   (let ((version linux-libre-4.19-version)
-        (hash (base32 "1rcx99sz4fgr2d138i92dw2vfplnqgys58hxywgmjb56c83l3qy4")))
+        (hash (base32 "1ii9l44d6jxhyd5qkc5h83ixailma9v7hyl60wi3rskkafqnwv2m")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.19)))
 
-(define-public linux-libre-4.14-version "4.14.244")
+(define-public linux-libre-4.14-version "4.14.245")
 (define deblob-scripts-4.14
   (linux-libre-deblob-scripts
    linux-libre-4.14-version
@@ -420,12 +420,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1qij18inijj6c3ma8hv98yjagnzxdxyn134da9fd23ky8q6hbvky")))
 (define-public linux-libre-4.14-pristine-source
   (let ((version linux-libre-4.14-version)
-        (hash (base32 "0x554dck5f78ljknwahjvf49952s1w0zja3yh4vfz6lmf6hvzq5n")))
+        (hash (base32 "085jls7b2rzxlmvp0zsp4l3wi5xdrqlv2qczzwvbhzna1f4n2x0d")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.14)))
 
-(define-public linux-libre-4.9-version "4.9.280")
+(define-public linux-libre-4.9-version "4.9.281")
 (define deblob-scripts-4.9
   (linux-libre-deblob-scripts
    linux-libre-4.9-version
@@ -433,12 +433,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "0fxajshb75siq39lj5h8xvhdj8lcmddkslwlyj65rhlwk6g2r4b2")))
 (define-public linux-libre-4.9-pristine-source
   (let ((version linux-libre-4.9-version)
-        (hash (base32 "0am9qg9j18j4fc5zi6bk1g0mi8dp31pl62wlihxhhkc5yspzrna3")))
+        (hash (base32 "1dg70jv3bqanmjs31s0x2p7nd5g37bqzjn9rc1y6wvkgm4pwahi6")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.9)))
 
-(define-public linux-libre-4.4-version "4.4.281")
+(define-public linux-libre-4.4-version "4.4.282")
 (define deblob-scripts-4.4
   (linux-libre-deblob-scripts
    linux-libre-4.4-version
@@ -446,7 +446,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "0hhin1jpfkd6nwrb6xqxjzl3hdxy4pn8a15hy2d3d83yw6pflbsf")))
 (define-public linux-libre-4.4-pristine-source
   (let ((version linux-libre-4.4-version)
-        (hash (base32 "12grr2vc2mcvy7k8w1apqs9mhfg0lvz6mrpksym234m4n5yy48ng")))
+        (hash (base32 "1rgxznjb6gsi64wk7x2rylyi64y2nx5yiah5gfm40c6l2f7lb9cc")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.4)))
@@ -1138,7 +1138,7 @@ It has been modified to remove all non-free binary blobs.")
 (define-public acpi-call-linux-module
   (package
     (name "acpi-call-linux-module")
-    (version "1.2.1")
+    (version "1.2.2")
     (source
      (origin
        (method git-fetch)
@@ -1147,7 +1147,7 @@ It has been modified to remove all non-free binary blobs.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0mr4rjbv6fj4phf038addrgv32940bphghw2v9n1z4awvw7wzkbg"))))
+        (base32 "1s7h9y3adyfhw7cjldlfmid79lrwz3vqlvziw9nwd6x5qdj4w9vp"))))
     (build-system linux-module-build-system)
     (arguments
      `(#:tests? #f                      ; no tests
@@ -1159,8 +1159,7 @@ It has been modified to remove all non-free binary blobs.")
            (lambda _
              (substitute* (find-files "examples" ".")
                (("^(#! *)/[^ ]*/" _ shebang)
-                (string-append shebang "/usr/bin/env ")))
-             #t))
+                (string-append shebang "/usr/bin/env ")))))
          (add-after 'install 'install-documentation
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out (assoc-ref outputs "out"))
@@ -1169,9 +1168,8 @@ It has been modified to remove all non-free binary blobs.")
                            (let ((target (string-append doc "/" file)))
                              (mkdir-p (dirname target))
                              (copy-recursively file target)))
-                         (list "README.md" "examples"))
-               #t))))))
-    (home-page "https://github.com/teleshoes/acpi_call")
+                         (list "README.md" "examples"))))))))
+    (home-page "https://github.com/nix-community/acpi_call")
     (synopsis "Linux kernel module to perform ACPI method calls")
     (description
      "This simple Linux kernel module allows calls from user space to any
@@ -6848,7 +6846,7 @@ used by nftables.")
 (define-public nftables
   (package
     (name "nftables")
-    (version "0.9.9")
+    (version "1.0.0")
     (source
      (origin
        (method url-fetch)
@@ -6857,10 +6855,11 @@ used by nftables.")
                   (string-append "https://www.nftables.org/projects/nftables"
                                  "/files/nftables-" version ".tar.bz2")))
        (sha256
-        (base32 "1d7iwc8xlyfsbgn6qx1sdfcq7jhpl8wpfj39hcd06y8dzp3jvvvn"))))
+        (base32 "1x25zs2czmn14mmq1nqi4zibsvh04vqjbx5lxj42nylnmxym9gsq"))))
     (build-system gnu-build-system)
     (arguments `(#:configure-flags
-                 '("--disable-man-doc"))) ; FIXME: Needs docbook2x.
+                 '("--disable-man-doc"  ; FIXME: needs docbook2x
+                   "--disable-static")))
     (inputs `(("gmp" ,gmp)
               ("libmnl" ,libmnl)
               ("libnftnl" ,libnftnl)

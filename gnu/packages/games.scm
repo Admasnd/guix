@@ -131,6 +131,7 @@
   #:use-module (gnu packages gnu-doc)
   #:use-module (gnu packages gnupg)
   #:use-module (gnu packages gnuzilla)
+  #:use-module (gnu packages golang)
   #:use-module (gnu packages gperf)
   #:use-module (gnu packages graphics)
   #:use-module (gnu packages gsasl)
@@ -879,7 +880,7 @@ high a score as possible.")
 (define-public cataclysm-dda
   (package
     (name "cataclysm-dda")
-    (version "0.F-1")
+    (version "0.F-2")
     (source
      (origin
        (method git-fetch)
@@ -887,7 +888,7 @@ high a score as possible.")
              (url "https://github.com/CleverRaven/Cataclysm-DDA")
              (commit version)))
        (sha256
-        (base32 "03a4q0y6vci278yb6b6d0qwk9abn1qgqifcmbrm5wrqbqygjalkd"))
+        (base32 "1wzsri6rh2fm7078hw0y4x7lqjs6ak4a66d05szfiinnxyn4w1ph"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments
@@ -9373,10 +9374,65 @@ and bring the war to your enemy.")
                    license:expat license:fdl1.3+ license:public-domain
                    license:zlib))))
 
+(define-public go-github-com-anaseto-gruid
+  (package
+    (name "go-github-com-anaseto-gruid")
+    (version "0.21.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/anaseto/gruid")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0rvsavkvg2hziwdh8sjk3n5v92m5mfjb8v9m7ch22maxfwq5kv6y"))))
+    (build-system go-build-system)
+    (arguments
+     '(#:import-path "github.com/anaseto/gruid"))
+    (propagated-inputs
+     `(("go-golang-org-x-image" ,go-golang-org-x-image)))
+    (home-page "https://github.com/anaseto/gruid")
+    (synopsis "Cross-platform grid-based UI and game framework")
+    (description "The gruid module provides packages for easily building
+grid-based applications in Go.  The library abstracts rendering and input for
+different platforms.  There are drivers available for terminal apps, native
+graphical apps and browser apps.  The original application for the library was
+creating grid-based games, but it's also well suited for any grid-based
+application.")
+    (license license:isc)))
+
+(define-public go-github-com-anaseto-gruid-tcell
+  (package
+    (name "go-github-com-anaseto-gruid-tcell")
+    (version "0.1.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/anaseto/gruid-tcell")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "09ajr9mbldjfc44qprplbf8dr8yhlbn2nfnas2z62m9wmklc0qiv"))))
+    (build-system go-build-system)
+    (arguments
+     '(#:import-path "github.com/anaseto/gruid-tcell"))
+    (propagated-inputs
+     `(("go-github-com-gdamore-tcell-v2" ,go-github-com-gdamore-tcell-v2)
+       ("go-github-com-anaseto-gruid" ,go-github-com-anaseto-gruid)))
+    (home-page "https://github.com/anaseto/gruid-tcell")
+    (synopsis "Gruid driver using the tcell library")
+    (description "The gruid-tcell module provides a Gruid driver for building
+terminal full-window applications.")
+    (license license:isc)))
+
 (define-public harmonist
   (package
     (name "harmonist")
-    (version "0.3.0")
+    (version "0.4.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -9385,12 +9441,15 @@ and bring the war to your enemy.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "146wiyanag0zqj6fhyll2sw6sydnnll8mgxhhqf9sjqsl2rx4s5r"))))
+                "17ai39pw9xq4asfvhs0whx07hljlivygazbwrxjrnxwrn06483hr"))))
     (build-system go-build-system)
     (arguments
      '(#:import-path "git.tuxfamily.org/harmonist/harmonist"))
     (inputs
-     `(("go-github.com-nsf-termbox-go" ,go-github.com-nsf-termbox-go)))
+     `(("go-github-com-gdamore-tcell-v2" ,go-github-com-gdamore-tcell-v2)
+       ("go-github.com-nsf-termbox-go" ,go-github.com-nsf-termbox-go)
+       ("go-github-com-anaseto-gruid" ,go-github-com-anaseto-gruid)
+       ("go-github-com-anaseto-gruid-tcell" ,go-github-com-anaseto-gruid-tcell)))
     (home-page "https://harmonist.tuxfamily.org/")
     (synopsis "Stealth coffee-break roguelike game")
     (description "Harmonist: Dayoriah Clan Infiltration is a stealth
@@ -9400,26 +9459,6 @@ and cones of view for monsters.  Aiming for a replayable streamlined experience,
 the game avoids complex inventory management and character building, relying
 on items and player adaptability for character progression.")
     (license license:isc)))
-
-(define-public harmonist-tk
-  (package
-    (inherit harmonist)
-    (name "harmonist-tk")
-    (arguments
-      (append
-        (package-arguments harmonist)
-        `(#:phases
-          (modify-phases %standard-phases
-            (replace 'build
-              (lambda _
-                (invoke "go" "install" "-v" "-x" "--tags" "tk"
-                        "git.tuxfamily.org/harmonist/harmonist")))
-            (replace 'check
-              (lambda _
-                (invoke "go" "test" "--tags" "tk"
-                        "git.tuxfamily.org/harmonist/harmonist")))))))
-    (inputs
-     `(("go-github.com-nsf-gothic" ,go-github.com-nsf-gothic)))))
 
 (define-public drascula
   (package

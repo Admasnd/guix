@@ -102,6 +102,7 @@
 ;;; Copyright © 2021 Dhruvin Gandhi <contact@dhruvin.dev>
 ;;; Copyright © 2021 Matthew James Kraai <kraai@ftbfs.org>
 ;;; Copyright © 2021 Noisytoot <noisytoot@disroot.org>
+;;; Copyright © 2021 Simon South <simon@simonsouth.net>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -3773,7 +3774,7 @@ a command.")
 (define-public emacs-olivetti
   (package
     (name "emacs-olivetti")
-    (version "2.0.2")
+    (version "2.0.3")
     (source
      (origin
        (method git-fetch)
@@ -3782,7 +3783,7 @@ a command.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0nx16w2d1wrqa5cgpbwqfy2al49b9nx2pr9zygiz5qa8jdlzw86l"))))
+        (base32 "0qhv4ah9bn1mjvivgxp7z1gf91d0cdr2ma5cy5xaja97ispa4l3z"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/rnkn/olivetti")
     (synopsis "Emacs minor mode for a nice writing environment")
@@ -7497,7 +7498,7 @@ cards created in Org mode.")
 (define-public emacs-org-mime
   (package
     (name "emacs-org-mime")
-    (version "0.2.2")
+    (version "0.2.3")
     (source
      (origin
        (method git-fetch)
@@ -7506,7 +7507,7 @@ cards created in Org mode.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0gvir8c8b2m5z784ml5h957f7mxgp3vn7v91p6igaq5bjf5xcfpp"))))
+        (base32 "1g32chan6rhlp3kvzd2lvf104i3p37q1sm0d89pq6sya0ia2as1n"))))
     (build-system emacs-build-system)
     (home-page "https://github.com/org-mime/org-mime")
     (synopsis "Send HTML email using Org mode HTML export")
@@ -10212,7 +10213,7 @@ with Elfeed.")
 (define-public emacs-elfeed-score
   (package
     (name "emacs-elfeed-score")
-    (version "0.8.4")
+    (version "0.8.6")
     (source
      (origin
        (method git-fetch)
@@ -10221,7 +10222,7 @@ with Elfeed.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1whf7nxfpb003wk9v15ib4xy1a7dfygdkg7jf3ly5z5l81607ap8"))))
+        (base32 "1r77b5vj4klqww7q7flw8h5i9w6y36zv2n7hx36pp1sav6s3a4r9"))))
     (build-system emacs-build-system)
     (propagated-inputs
      `(("emacs-elfeed" ,emacs-elfeed)))
@@ -12341,7 +12342,7 @@ known loosely as deftheme.  Many mode-specific customizations are included.")
 (define-public emacs-dart-mode
   (package
     (name "emacs-dart-mode")
-    (version "1.0.5")
+    (version "1.0.7")
     (source
      (origin
        (method git-fetch)
@@ -12350,7 +12351,7 @@ known loosely as deftheme.  Many mode-specific customizations are included.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1qmdlwjmmqyyb65sqvfpygifai5m0llc815vp0jqwp8ldd8ls172"))))
+        (base32 "1vql8m4nj0brmv58b6lkbhykik8n6j4i7d3nylcls78y7ihc2cz8"))))
     (build-system emacs-build-system)
     (propagated-inputs
      `(("emacs-dash" ,emacs-dash)
@@ -12364,29 +12365,28 @@ basic syntax highlighting and indentation.")
     (license license:gpl3+)))
 
 (define-public emacs-danneskjold-theme
-  (let* ((commit "8733d2fe8743e8a01826ea6d4430ef376c727e57")
-         (revision "1"))
+  (let* ((commit "e4d1f2c76245fe9d0d07133a841e789d139df28d")
+         (revision "2"))
     (package
       (name "emacs-danneskjold-theme")
-      (version (string-append "0.0.0-" revision "." (string-take commit 7)))
-      (home-page "https://github.com/rails-to-cosmos/danneskjold-theme")
+      (version (git-version "0.0.0" revision commit))
       (source
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url home-page)
+               (url "https://github.com/rails-to-cosmos/danneskjold-theme")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32
-           "0s6rbsb0y8i8m5b9xm4gw1p1cxsxdqnqxqqb638pygz9f76mbir1"))))
+          (base32 "0s6rbsb0y8i8m5b9xm4gw1p1cxsxdqnqxqqb638pygz9f76mbir1"))))
       (build-system emacs-build-system)
       (arguments
        `(#:phases
          (modify-phases %standard-phases
            (add-after 'unpack 'delete-screenshots
              (lambda _
-               (delete-file-recursively "screenshots") #t)))))
+               (delete-file-recursively "screenshots"))))))
+      (home-page "https://github.com/rails-to-cosmos/danneskjold-theme")
       (synopsis "High-contrast Emacs theme")
       (description
        "@code{danneskjold-theme} is a high-contrast theme for Emacs.")
@@ -13601,7 +13601,7 @@ configuration of Chinese fonts.")
 (define-public emacs-boon
   (package
     (name "emacs-boon")
-    (version "1.1")
+    (version "1.2")
     (source
      (origin
        (method git-fetch)
@@ -13610,7 +13610,7 @@ configuration of Chinese fonts.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1ss9bjs34q41pa0g0nbdzd8fwpjcbd2239rdlx5aykfv9v0b8j77"))))
+        (base32 "18il2licf8pgfcrpx2bk55gpf8f537kb9cxqz83jldkhiyry74il"))))
     (build-system emacs-build-system)
     (propagated-inputs
      `(("emacs-dash" ,emacs-dash)
@@ -15979,29 +15979,38 @@ supports multiple backends such as @code{vlc}, @code{mpg123},
 (define-public emacs-groovy-modes
   (package
     (name "emacs-groovy-modes")
-    (version "2.0")
+    (version "2.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
-                     (url "https://github.com/Groovy-Emacs-Modes/groovy-emacs-modes")
-                     (commit version)))
+                    (url "https://github.com/Groovy-Emacs-Modes\
+/groovy-emacs-modes")
+                    (commit version)))
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "0c1d4cbnlny8gpcd20zr1wxx6ggf28jgh7sgd5r1skpsvjpbfqx2"))))
+                "1jpfyqnqd8nj0g8xbiw4ar2qzxx3pvhwibr6hdzhyy9mmc4yzdgk"))))
     (build-system emacs-build-system)
+    (arguments
+     `(#:tests? #t
+       #:test-command '("ert-runner")))
+    (native-inputs
+     `(("emacs-ert-runner" ,emacs-ert-runner)
+       ("emacs-undercover" ,emacs-undercover)
+       ("emacs-shut-up" ,emacs-shut-up)
+       ("emacs-f" ,emacs-f)))
     (propagated-inputs
-     `(("emacs-s" ,emacs-s)))
+     `(("emacs-dash" ,emacs-dash)
+       ("emacs-s" ,emacs-s)))
     (home-page "https://github.com/Groovy-Emacs-Modes/groovy-emacs-modes")
     (synopsis "Groovy related modes for Emacs")
-    (description
-     "This package provides @code{groovy-mode} for syntax highlighting in
-Groovy source files, REPL integration with run-groovy and Grails project
-navigation with the grails mode.")
+    (description "This package provides @code{groovy-mode} for syntax
+highlighting in Groovy source files, REPL integration with run-groovy and
+Grails project navigation with the grails mode.")
     (license license:gpl3+)))
 
 (define-public emacs-jenkinsfile-mode
-  (let ((commit "00d259ff9b870d234540e00e1d7c83cccdb063b8")
+  (let ((commit "65bf3925852c35c6bd499978f08f83c1193f4347")
         (revision "1"))
     (package
       (name "emacs-jenkinsfile-mode")
@@ -16014,7 +16023,7 @@ navigation with the grails mode.")
                 (file-name (git-file-name name version))
                 (sha256
                  (base32
-                  "0srf6xdjnrd4v4ks9pal7i48wmkcl4q5ry7d0yzfx1c9pz2qg9zx"))))
+                  "0w38g88yykslg71xr99ff4vx1ffgy90b7xqvvdflr189gwk3avx1"))))
       (propagated-inputs
        `(("emacs-groovy-modes" ,emacs-groovy-modes)))
       (build-system emacs-build-system)
@@ -18066,30 +18075,28 @@ confused by comments or @code{foo-bar} matching @code{foo}.")
     (license license:gpl3+)))
 
 (define-public emacs-crdt
-  (let ((commit "44068ae505adf2c3a7bdbf6723a25fc45d6d1666")
-        (revision "0"))
-    (package
-      (name "emacs-crdt")
-      (version (git-version "0.0.0" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://code.librehq.com/qhong/crdt.el")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "130fkhvi757pfnbz70g6nw2n71k89cwwx7yzvsd5v177228c8w7w"))))
-      (build-system emacs-build-system)
-      (home-page "https://code.librehq.com/qhong/crdt.el")
-      (synopsis "Real-time collaborative editing environment")
-      (description
-       "@code{crdt.el} is a real-time collaborative editing environment for
+  (package
+    (name "emacs-crdt")
+    (version "0.1.4")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://code.librehq.com/qhong/crdt.el")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0455n75nan7abwnp7zfvrdbqmvlvfp0sf1ififr57h3sqsx3llhk"))))
+    (build-system emacs-build-system)
+    (home-page "https://code.librehq.com/qhong/crdt.el")
+    (synopsis "Real-time collaborative editing environment")
+    (description
+     "@code{crdt.el} is a real-time collaborative editing environment for
 Emacs using Conflict-free Replicated Data Types.  With it, you can share
 multiple buffer in one session, and see other users’ cursor and region.  It
 also synchronizes Org mode folding status.  It should work with all of Org
 mode.")
-      (license license:gpl3+))))
+    (license license:gpl3+)))
 
 (define-public emacs-crux
   (package
@@ -18872,6 +18879,28 @@ feeling where the region stays static (instead of being brutally moved to a
 blank slate) and is clearly highlighted with respect to the rest of the
 buffer.")
     (license license:gpl2+)))
+
+(define-public emacs-hideshowvis
+  (let ((commit "614e856620445166a60c00a1c4653dbd59c871c9")
+        (revision "1"))
+    (package
+      (name "emacs-hideshowvis")
+      (version (git-version "0.7" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/sheijk/hideshowvis")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "0ykj5jwcm03p5h7sd52qndmzihyan09lqg6rzgmyabvw7p56y90m"))))
+      (build-system emacs-build-system)
+      (home-page "https://github.com/sheijk/hideshowvis")
+      (synopsis "Add icons in the Emacs fringe which @code{hideshow} can hide")
+      (description "Emacs package to add clickable icons in the fringe for
+regions which @code{hideshow} can hide.")
+      (license license:gpl2+))))
 
 (define-public emacs-know-your-http-well
   (package
@@ -23492,7 +23521,7 @@ constant expressions.")
 (define-public emacs-dockerfile-mode
   (package
     (name "emacs-dockerfile-mode")
-    (version "1.4")
+    (version "1.5")
     (source
      (origin
        (method git-fetch)
@@ -23502,7 +23531,7 @@ constant expressions.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "1ypkihd9si769r6k0lfrv8jq8mjv4gyhiwyi820sayfppvma5rj0"))))
+         "09pd8mfa45fy95mdg52fsafj3d1d5l52rskmw6q5np59dyzwch1b"))))
     (build-system emacs-build-system)
     (propagated-inputs
      `(("emacs-s" ,emacs-s)))
@@ -25128,14 +25157,14 @@ well as an option for visually flashing evaluated s-expressions.")
 (define-public emacs-tramp
   (package
     (name "emacs-tramp")
-    (version "2.5.1.1")
+    (version "2.5.1.2")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://elpa.gnu.org/packages/"
                            "tramp-" version ".tar"))
        (sha256
-        (base32 "0v3rvvhjcnyvg6l4vyxz6513mxzvv9n0skkmr62ry8yi5x9wnqp1"))))
+        (base32 "0p8m8prxrvrr455ahb626c1dry04m80y017h16ngr4i5ais0r85g"))))
     (build-system emacs-build-system)
     (arguments
      `(#:emacs ,emacs                   ;need D-Bus
@@ -27486,6 +27515,31 @@ with Helm and displays a buffer of all the different result types available to
 Wordnet.")
       (license license:gpl3+))))
 
+(define-public emacs-helm-xref
+  (let ((commit "23f1174cfca7667d95828dcd388c655a4a9c877d")
+        (revision "1"))
+    (package
+      (name "emacs-helm-xref")
+      (version (git-version "0.5" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/brotzeit/helm-xref")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "0v0lkabpi1n4hgnp28jk19f7b78yk93ssm0gr0fr25yqx5zskdnk"))))
+      (build-system emacs-build-system)
+      (propagated-inputs
+       `(("emacs-helm" ,emacs-helm)))
+      (home-page "https://github.com/brotzeit/helm-xref")
+      (synopsis "Helm interface for @code{xref}")
+      (description "This package provides a Helm interface for selecting
+@code{xref} results.")
+      (license license:gpl3+))))
+
 (define-public emacs-metal-mercury-mode
   (let ((commit "99e2d8fb7177cae3bfa2dec2910fc28216d5f5a8")
 	(revision "1")
@@ -28726,6 +28780,30 @@ label references and citations in LaTeX.  It is based on RefTeX, which is
 included with Emacs.")
     (license license:gpl3+)))
 
+(define-public emacs-company-org-block
+  (let ((commit "115af0a3625f4669358eca568466d468cacc78bd")
+        (revision "1"))
+    (package
+      (name "emacs-company-org-block")
+      (version (git-version "0.3" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/xenodium/company-org-block")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "13kdwi4d1pvba6wv9yn1s0dl4cnq61zwf3j647d1s5ybqlrw5f4r"))))
+      (build-system emacs-build-system)
+      (propagated-inputs
+       `(("emacs-company" ,emacs-company)))
+      (home-page "https://github.com/xenodium/company-org-block")
+      (synopsis "Emacs @code{company-complete} for Org blocks")
+      (description
+       "Insert Emacs Org blocks with completion via @code{company} mode.")
+      (license license:gpl3+))))
+
 (define-public emacs-html-to-hiccup
   ;; Package has no release.  Version is extracted from "Version:" keyword in
   ;; main file.
@@ -29279,6 +29357,27 @@ shorter than usual, using mostly unprefixed keys.")
     (description "This packages provides a major mode for editing
 @acronym{CWL, Common Workflow Language} files.")
     (license license:gpl3+)))
+
+(define-public emacs-dictionary
+  (package
+    (name "emacs-dictionary")
+    (version "1.11")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/myrkr/dictionary-el")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "0zsjbpq0s0xdxd9r541f04bj1khhgzhdlzr0m4p17zjh1zardbpi"))))
+    (build-system emacs-build-system)
+    (home-page "http://www.myrkr.in-berlin.de/dictionary/index.html")
+    (synopsis "Emacs client for dictionary servers")
+    (description "This package provides commands for interacting with a
+dictionary server (as defined by RFC 2229; by default, the public server at
+dict.org) from within Emacs.")
+    (license license:gpl2+)))
 
 (define-public emacs-multitran
   (package

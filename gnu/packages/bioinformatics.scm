@@ -103,6 +103,7 @@
   #:use-module (gnu packages java)
   #:use-module (gnu packages java-compression)
   #:use-module (gnu packages jemalloc)
+  #:use-module (gnu packages jupyter)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages lisp-xyz)
   #:use-module (gnu packages logging)
@@ -11452,38 +11453,53 @@ implementation differs in these ways:
 (define-public python-scanpy
   (package
     (name "python-scanpy")
-    (version "1.7.2")
+    (version "1.8.1")
     (source
      (origin
-       (method url-fetch)
-       (uri (pypi-uri "scanpy" version))
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/theislab/scanpy")
+             (commit version)))
+       (file-name (git-file-name name version))
        (sha256
         (base32
-         "0c66adnfizsyk0h8bv2yhmay876z0klpxwpn4z6m71wly7yplpmd"))))
+         "0w1qmv3djqi8q0sn5hv34ivzs157fwjjb9nflfnagnhpxmw8vx5g"))))
     (build-system python-build-system)
     (arguments
      `(#:phases
        (modify-phases %standard-phases
+         (replace 'build
+           (lambda _
+             (setenv "SETUPTOOLS_SCM_PRETEND_VERSION" ,version)
+             ;; ZIP does not support timestamps before 1980.
+             (setenv "SOURCE_DATE_EPOCH" "315532800")
+             (invoke "flit" "build")))
+         (replace 'install
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (add-installed-pythonpath inputs outputs)
+             (let ((out (assoc-ref outputs "out")))
+               (for-each (lambda (wheel)
+                           (format #true wheel)
+                           (invoke "python" "-m" "pip" "install"
+                                   wheel (string-append "--prefix=" out)))
+                         (find-files "dist" "\\.whl$")))))
          (replace 'check
            (lambda* (#:key inputs #:allow-other-keys)
              ;; These tests require Internet access.
              (delete-file-recursively "scanpy/tests/notebooks")
              (delete-file "scanpy/tests/test_clustering.py")
              (delete-file "scanpy/tests/test_datasets.py")
+             (delete-file "scanpy/tests/test_score_genes.py")
              (delete-file "scanpy/tests/test_highly_variable_genes.py")
 
              ;; TODO: I can't get the plotting tests to work, even with Xvfb.
-             (delete-file "scanpy/tests/test_plotting.py")
+             (delete-file "scanpy/tests/test_embedding_plots.py")
              (delete-file "scanpy/tests/test_preprocessing.py")
              (delete-file "scanpy/tests/test_read_10x.py")
 
-             ;; The following tests need anndata.tests, which aren't included
-             ;; in the final python-anndata package.
-             (delete-file "scanpy/tests/test_combat.py")
-             (delete-file "scanpy/tests/test_embedding_plots.py")
-             (delete-file "scanpy/tests/test_normalization.py")
-             (delete-file "scanpy/tests/test_pca.py")
-             (delete-file "scanpy/tests/external/test_scrublet.py")
+             ;; TODO: these fail with TypingError and "Use of unsupported
+             ;; NumPy function 'numpy.split'".
+             (delete-file "scanpy/tests/test_metrics.py")
 
              ;; The following tests requires 'scanorama', which isn't
              ;; packaged yet.
@@ -11491,9 +11507,24 @@ implementation differs in these ways:
 
              (setenv "PYTHONPATH"
                      (string-append (getcwd) ":"
+                                    (assoc-ref inputs "python-anndata:source") ":"
                                     (getenv "PYTHONPATH")))
-             (invoke "pytest")
-             #t)))))
+             (invoke "pytest" "-vv"
+                     "-k"
+                     ;; Plot tests that fail.
+                     (string-append "not test_dotplot_matrixplot_stacked_violin"
+                                    " and not test_violin_without_raw"
+                                    " and not test_correlation"
+                                    " and not test_scatterplots"
+                                    " and not test_scatter_embedding_add_outline_vmin_vmax_norm"
+                                    " and not test_paga"
+                                    " and not test_paga_compare"
+
+                                    ;; These try to connect to the network
+                                    " and not test_plot_rank_genes_groups_gene_symbols"
+                                    " and not test_pca_chunked"
+                                    " and not test_pca_sparse"
+                                    " and not test_pca_reproducible")))))))
     (propagated-inputs
      `(("python-anndata" ,python-anndata)
        ("python-h5py" ,python-h5py)
@@ -11511,16 +11542,19 @@ implementation differs in these ways:
        ("python-scikit-learn" ,python-scikit-learn)
        ("python-scipy" ,python-scipy)
        ("python-seaborn" ,python-seaborn)
+       ("python-sinfo" ,python-sinfo)
        ("python-statsmodels" ,python-statsmodels)
        ("python-tables" ,python-tables)
        ("python-pytoml" ,python-pytoml)
        ("python-tqdm" ,python-tqdm)
        ("python-umap-learn" ,python-umap-learn)))
     (native-inputs
-     `(("python-leidenalg" ,python-leidenalg)
+     `(;; This package needs anndata.tests, which is not installed.
+       ("python-anndata:source" ,(package-source python-anndata))
+       ("python-flit" ,python-flit)
+       ("python-leidenalg" ,python-leidenalg)
        ("python-pytest" ,python-pytest)
-       ("python-setuptools-scm" ,python-setuptools-scm)
-       ("python-sinfo" ,python-sinfo)))
+       ("python-setuptools-scm" ,python-setuptools-scm)))
     (home-page "https://github.com/theislab/scanpy")
     (synopsis "Single-Cell Analysis in Python.")
     (description "Scanpy is a scalable toolkit for analyzing single-cell gene
@@ -14787,13 +14821,183 @@ instruments, or Pacific Biosciences RSII or Sequel sequencers.")
     (build-system python-build-system)
     (inputs
      `(("curl" ,curl)
-       ("pybind11" ,pybind11)
        ("zlib" ,zlib)))
+    (propagated-inputs
+     `(("pybind11" ,pybind11)))
     (home-page "https://github.com/aidenlab/straw")
     (synopsis "Stream data from .hic files")
     (description "Straw is library which allows rapid streaming of contact
 data from @file{.hic} files.  This package provides Python bindings.")
     (license license:expat)))
+
+(define-public python-pybbi
+  (package
+    (name "python-pybbi")
+    (version "0.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pybbi" version))
+       (sha256
+        (base32
+         "1hvy2f28i2b41l1pq15vciqbj538n0lichp8yr6413jmgg06xdsk"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:tests? #false ; tests require network access
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'set-cc
+           (lambda _ (setenv "CC" "gcc")))
+         (replace 'check
+           (lambda* (#:key inputs outputs tests? #:allow-other-keys)
+             (when tests?
+               (add-installed-pythonpath inputs outputs)
+               (copy-recursively "tests" "/tmp/tests")
+               (with-directory-excursion "/tmp/tests"
+                 (invoke "python" "-m" "pytest" "-v"))))))))
+    (native-inputs
+     `(("pkg-config" ,pkg-config)
+       ("python-pkgconfig" ,python-pkgconfig)
+       ("python-pytest" ,python-pytest)))
+    (inputs
+     `(("libpng" ,libpng)
+       ("openssl" ,openssl)
+       ("zlib" ,zlib)))
+    (propagated-inputs
+     `(("python-cython" ,python-cython)
+       ("python-numpy" ,python-numpy)
+       ("python-pandas" ,python-pandas)
+       ("python-six" ,python-six)))
+    (home-page "https://github.com/nvictus/pybbi")
+    (synopsis "Python bindings to UCSC Big Binary file library")
+    (description
+     "This package provides Python bindings to the UCSC Big
+Binary (bigWig/bigBed) file library.  This provides read-level access to local
+and remote bigWig and bigBed files but no write capabilitites.  The main
+feature is fast retrieval of range queries into numpy arrays.")
+    (license license:expat)))
+
+(define-public python-dna-features-viewer
+  (package
+    (name "python-dna-features-viewer")
+    (version "3.0.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "dna_features_viewer" version))
+       (sha256
+        (base32
+         "0vci6kg2id6r6rh3cifq7ccnh7j0mb8iqg3hji6rva0ayrdqzafc"))))
+    (build-system python-build-system)
+    (arguments '(#:tests? #false)) ; there are none
+    (propagated-inputs
+     `(("python-biopython" ,python-biopython)
+       ("python-matplotlib" ,python-matplotlib)))
+    (home-page
+     "https://github.com/Edinburgh-Genome-Foundry/DnaFeaturesViewer")
+    (synopsis "Plot features from DNA sequences")
+    (description
+     "DNA Features Viewer is a Python library to visualize DNA features,
+e.g. from GenBank or Gff files, or Biopython SeqRecords.")
+    (license license:expat)))
+
+(define-public python-coolbox
+  (package
+    (name "python-coolbox")
+    (version "0.3.8")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "coolbox" version))
+       (sha256
+        (base32
+         "0gqp76285w9klswr47y6kxbzwhv033b26jfa179kccfhiaq5p2xa"))))
+    (build-system python-build-system)
+    (arguments '(#:tests? #false)) ; there are none
+    (inputs
+     `(("pybind11" ,pybind11)))
+    (propagated-inputs
+     `(("python-cooler" ,python-cooler)
+       ("python-dna-features-viewer" ,python-dna-features-viewer)
+       ("python-fire" ,python-fire)
+       ("python-h5py" ,python-h5py)
+       ("python-intervaltree" ,python-intervaltree)
+       ("python-ipywidgets" ,python-ipywidgets)
+       ("jupyter" ,jupyter)
+       ("python-matplotlib" ,python-matplotlib)
+       ("python-nbformat" ,python-nbformat)
+       ("python-numpy" ,python-numpy)
+       ("python-numpydoc" ,python-numpydoc)
+       ("python-pandas" ,python-pandas)
+       ("python-pybbi" ,python-pybbi)
+       ("python-pytest" ,python-pytest)
+       ("python-scipy" ,python-scipy)
+       ("python-statsmodels" ,python-statsmodels)
+       ("python-strawc" ,python-strawc)
+       ("python-svgutils" ,python-svgutils)
+       ("python-termcolor" ,python-termcolor)
+       ("python-voila" ,python-voila)))
+    (home-page "https://github.com/GangCaoLab/CoolBox")
+    (synopsis "Genomic data visualization toolkit")
+    (description
+     "CoolBox is a toolkit for visual analysis of genomics data.  It aims to
+be highly compatible with the Python ecosystem, easy to use and highly
+customizable with a well-designed user interface.  It can be used in various
+visualization situations, for example, to produce high-quality genome track
+plots or fetch common used genomic data files with a Python script or command
+line, interactively explore genomic data within Jupyter environment or web
+browser.")
+    (license license:gpl3+)))
+
+(define-public scregseg
+  (package
+    (name "scregseg")
+    (version "0.1.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/BIMSBbioinfo/scregseg")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1k8hllr5if6k2mm2zj391fv40sfc008cjm04l9vgfsdppb80i112"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:tests? #false                  ; tests require network access
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'do-not-fail-to-find-sklearn
+           (lambda _
+             ;; XXX: I have no idea why it cannot seem to find sklearn.
+             (substitute* "setup.py"
+               (("'sklearn',") "")))))))
+    (native-inputs
+     `(("python-cython" ,python-cython)))
+    (propagated-inputs
+     `(("python-scikit-learn" ,python-scikit-learn)
+       ("python-scipy" ,python-scipy)
+       ("python-numpy" ,python-numpy)
+       ("python-hmmlearn" ,python-hmmlearn)
+       ("python-pandas" ,python-pandas)
+       ("python-numba" ,python-numba)
+       ("python-anndata" ,python-anndata)
+       ("python-scanpy" ,python-scanpy)
+       ("python-pybedtools" ,python-pybedtools)
+       ("python-pysam" ,python-pysam)
+       ("python-matplotlib" ,python-matplotlib)
+       ("python-seaborn" ,python-seaborn)
+       ("python-coolbox" ,python-coolbox)))
+    (home-page "https://github.com/BIMSBbioinfo/scregseg")
+    (synopsis "Single-cell regulatory landscape segmentation")
+    (description "Scregseg (Single-Cell REGulatory landscape SEGmentation) is a
+tool that facilitates the analysis of single cell ATAC-seq data by an
+HMM-based segmentation algorithm.  Scregseg uses an HMM with
+Dirichlet-Multinomial emission probabilities to segment the genome either
+according to distinct relative cross-cell accessibility profiles or (after
+collapsing the single-cell tracks to pseudo-bulk tracks) to capture distinct
+cross-cluster accessibility profiles.")
+    (license license:gpl3+)))
 
 (define-public r-ascat
   (package
@@ -14853,6 +15057,34 @@ ploidy and allele-specific copy number profiles.")
 copy number estimation, as described by
 @url{doi:10.1016/j.cell.2012.04.023,Nik-Zainal et al.}")
    (license license:gpl3)))
+
+(define-public r-catch
+  (let ((commit "196ddd5a51b1a5f5daa01de53fdaad9b7505e084")
+        (revision "1"))
+    (package
+      (name "r-catch")
+      (version (git-version "1.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/zhanyinx/CaTCH")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "11c7f1fc8f57wnwk1hrgr5y814m80zj8gkz5021vxyxy2v02cqgd"))))
+      (build-system r-build-system)
+      (arguments
+       `(#:phases
+         (modify-phases %standard-phases
+           (add-after 'unpack 'chdir
+             (lambda _ (chdir "CaTCH"))))))
+      (home-page "https://github.com/zhanyinx/CaTCH_R")
+      (synopsis "Call a hierarchy of domains based on Hi-C data")
+      (description "This package allows building the hierarchy of domains
+starting from Hi-C data.  Each hierarchical level is identified by a minimum
+value of physical insulation between neighboring domains.")
+      (license license:gpl2+))))
 
 (define-public r-spectre
   (let ((commit "f6648ab3eb9499300d86502b5d60ec370ae9b61a")

@@ -3,7 +3,7 @@
 ;;; Copyright © 2014, 2015, 2016 Mark H Weaver <mhw@netris.org>
 ;;; Copyright © 2014 Eric Bavier <bavier@member.fsf.org>
 ;;; Copyright © 2014, 2015, 2016 Alex Kost <alezost@gmail.com>
-;;; Copyright © 2013, 2015, 2017, 2018, 2019 Ludovic Courtès <ludo@gnu.org>
+;;; Copyright © 2013, 2015, 2017, 2018, 2019, 2021y Ludovic Courtès <ludo@gnu.org>
 ;;; Copyright © 2015, 2016 Mathieu Lirzin <mthl@gnu.org>
 ;;; Copyright © 2015 Alexander I.Grafov <grafov@gmail.com>
 ;;; Copyright © 2015 Andy Wingo <wingo@igalia.com>
@@ -32,7 +32,7 @@
 ;;; Copyright © 2020, 2021 Guillaume Le Vaillant <glv@posteo.net>
 ;;; Copyright © 2020 David Wilson <david@daviwil.com>
 ;;; Copyright © 2020 Ivan Vilata i Balaguer <ivan@selidor.net>
-;;; Copyright © 2020 Brice Waegeneire <brice@waegenei.re>
+;;; Copyright © 2020, 2021 Brice Waegeneire <brice@waegenei.re>
 ;;; Copyright © 2020 Damien Cassou <damien@cassou.me>
 ;;; Copyright © 2020 John Soo <jsoo1@asu.edu>
 ;;; Copyright © 2020 Boris A. Dekshteyn <boris.dekshteyn@gmail.com>
@@ -766,7 +766,7 @@ move windows, switch between desktops, etc.).")
 (define-public scrot
   (package
     (name "scrot")
-    (version "1.5")
+    (version "1.6")
     (source
      (origin
        (method git-fetch)
@@ -776,14 +776,16 @@ move windows, switch between desktops, etc.).")
          (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "0x64b7xqi5cbq29pb8s8r2kzbxaday1f5k0j70n3s2p7sahjxy72"))))
+        (base32 "1qanx2xx9m5l995csqzfcm1ks2nhk90zga1wzbkjjl75ga4iik2h"))))
     (build-system gnu-build-system)
     (native-inputs
      `(("autoconf" ,autoconf)
        ("autoconf-archive" ,autoconf-archive)
-       ("automake" ,automake)))
+       ("automake" ,automake)
+       ("pkg-config" ,pkg-config)))
     (inputs
      `(("giblib" ,giblib)
+       ("imlib2" ,imlib2)
        ("libx11" ,libx11)
        ("libxcomposite" ,libxcomposite)
        ("libxext" ,libxext)
@@ -1740,15 +1742,15 @@ connectivity of the X server running on a particular @code{DISPLAY}.")
 (define-public rofi
   (package
     (name "rofi")
-    (version "1.6.1")
+    (version "1.7.0")
     (source (origin
               (method url-fetch)
-              (uri (string-append "https://github.com/DaveDavenport/rofi/"
+              (uri (string-append "https://github.com/davatorium/rofi/"
                                   "releases/download/"
                                   version "/rofi-" version ".tar.xz"))
               (sha256
                (base32
-                "12p9z8bl1gg8k024m4a6zfz7gf1zbyffardh98raqgabn6knwk22"))))
+                "1929q3dks8fqd3pfkzs0ba06gwzhlgcrfar9fpga43f3byrrbfxa"))))
     (build-system gnu-build-system)
     (inputs
      `(("pango" ,pango)
@@ -1760,6 +1762,7 @@ connectivity of the X server running on a particular @code{DISPLAY}.")
        ("libxkbcommon" ,libxkbcommon)
        ("libxcb" ,libxcb)
        ("xcb-util" ,xcb-util)
+       ("xcb-util-cursor" ,xcb-util-cursor)
        ("xcb-util-xrm" ,xcb-util-xrm)
        ("xcb-util-wm" ,xcb-util-wm)))
     (native-inputs
@@ -1779,7 +1782,7 @@ connectivity of the X server running on a particular @code{DISPLAY}.")
                (("~") "")
                (("g_get_home_dir \\(\\)") "\"/\""))
              #t)))))
-    (home-page "https://github.com/DaveDavenport/rofi")
+    (home-page "https://github.com/davatorium/rofi")
     (synopsis "Application launcher")
     (description "Rofi is a minimalist application launcher.  It memorizes which
 applications you regularly use and also allows you to search for an application
@@ -2205,7 +2208,7 @@ to automatically turn it on on login.")
 (define-public xrandr-invert-colors
   (package
     (name "xrandr-invert-colors")
-    (version "0.01")
+    (version "0.02")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -2214,7 +2217,7 @@ to automatically turn it on on login.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1br3x9vr6xm4ika06n8cfxx1b3wdchdqvyzjl4y1chmivrml8x9h"))))
+                "0gk1fgxb2kjyr78xn8m0ckjdic99ras7msa67piwnhj3j4scg1ih"))))
     (build-system gnu-build-system)
     (arguments
      `(#:make-flags (list ,(string-append "CC=" (cc-for-target)))
@@ -2223,11 +2226,14 @@ to automatically turn it on on login.")
        (modify-phases %standard-phases
          (delete 'configure)
          (replace 'install
+           ;; It's simpler to install the single binary ourselves than to patch
+           ;; the Makefile's install target into working.
            (lambda* (#:key outputs #:allow-other-keys)
              (let* ((out  (assoc-ref outputs "out"))
                     (bin  (string-append out "/bin")))
-               (install-file "xrandr-invert-colors.bin" bin)
-               #t))))))
+               (mkdir-p bin)
+               (copy-file "xrandr-invert-colors.bin"
+                          (string-append bin "/xrandr-invert-colors"))))))))
     (inputs
      `(("libxrandr" ,libxrandr)))
     (home-page "https://github.com/zoltanp/xrandr-invert-colors")

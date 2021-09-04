@@ -493,6 +493,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/packages/rednotebook.scm			\
   %D%/packages/regex.scm				\
   %D%/packages/robotics.scm			\
+  %D%/packages/rocm.scm				\
   %D%/packages/rpc.scm				\
   %D%/packages/rpm.scm				\
   %D%/packages/rrdtool.scm			\
@@ -668,6 +669,7 @@ GNU_SYSTEM_MODULES =				\
   %D%/system/mapped-devices.scm			\
   %D%/system/nss.scm				\
   %D%/system/pam.scm				\
+  %D%/system/setuid.scm				\
   %D%/system/shadow.scm				\
   %D%/system/uuid.scm				\
   %D%/system/vm.scm				\
@@ -877,7 +879,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/bsd-games-prevent-name-collisions.patch	\
   %D%/packages/patches/bsd-games-stdio.h.patch			\
   %D%/packages/patches/beancount-disable-googleapis-fonts.patch	\
-  %D%/packages/patches/beets-werkzeug-compat.patch		\
   %D%/packages/patches/behave-skip-a-couple-of-tests.patch	\
   %D%/packages/patches/beignet-correct-file-names.patch		\
   %D%/packages/patches/biber-fix-encoding-write.patch		\
@@ -1433,6 +1434,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/luit-posix.patch				\
   %D%/packages/patches/lvm2-static-link.patch			\
   %D%/packages/patches/mailutils-fix-uninitialized-variable.patch	\
+  %D%/packages/patches/mailutils-variable-lookup.patch		\
   %D%/packages/patches/make-impure-dirs.patch			\
   %D%/packages/patches/marble-qt-add-qt-headers.patch		\
   %D%/packages/patches/mariadb-CVE-2021-27928.patch		\
@@ -1635,6 +1637,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-cross-compile.patch		\
   %D%/packages/patches/python2-larch-coverage-4.0a6-compatibility.patch \
   %D%/packages/patches/python-configobj-setuptools.patch	\
+  %D%/packages/patches/python-execnet-read-only-fix.patch	\
   %D%/packages/patches/python-flask-restful-werkzeug-compat.patch	\
   %D%/packages/patches/python-keras-integration-test.patch	\
   %D%/packages/patches/python-pep8-stdlib-tokenize-compat.patch \
@@ -1642,7 +1645,6 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-flint-includes.patch		\
   %D%/packages/patches/python-libxml2-utf8.patch		\
   %D%/packages/patches/python-matplotlib-run-under-wayland-gtk3.patch	\
-  %D%/packages/patches/python-mediafile-wavpack.patch		\
   %D%/packages/patches/python-memcached-syntax-warnings.patch	\
   %D%/packages/patches/python-mox3-python3.6-compat.patch	\
   %D%/packages/patches/python-testtools.patch			\
@@ -1656,6 +1658,7 @@ dist_patch_DATA =						\
   %D%/packages/patches/python-pydot-regression-test.patch	\
   %D%/packages/patches/python2-pygobject-2-deprecation.patch	\
   %D%/packages/patches/python-pygpgme-fix-pinentry-tests.patch	\
+  %D%/packages/patches/python-pytest-asyncio-python-3.8.patch	\
   %D%/packages/patches/python-pytorch-runpath.patch		\
   %D%/packages/patches/python-pytorch-system-libraries.patch	\
   %D%/packages/patches/python-robotframework-source-date-epoch.patch \
