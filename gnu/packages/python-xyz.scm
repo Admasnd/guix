@@ -26679,3 +26679,98 @@ graph can be output for rendering by GraphViz or yEd.")
       "OnlyKey client and command-line tool")
     (license license:expat)))
 
+(define-public python-backports.shutil-which
+  (package
+    (name "python-backports.shutil-which")
+    (version "3.5.2")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "backports.shutil_which" version))
+        (sha256
+          (base32
+            "0cy16w2dpv110afncag8x1zhzy3yz0iypny4iagdiyp4rdkzafgy"))))
+    (build-system python-build-system)
+    (home-page
+      "https://github.com/minrk/backports.shutil_which")
+    (synopsis
+      "Backport of shutil.which from Python 3.3")
+    (description
+      "Backport of shutil.which from Python 3.3")
+    (license `(license:pfsl license:expat))))
+
+(define-public python-mnemonic
+  (package
+    (name "python-mnemonic")
+    (version "0.20")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "mnemonic" version))
+        (sha256
+          (base32
+            "1xi5qvj2rvi5almf9c89rl7hz1z4ms04d53pg818i4vpkmivavvw"))))
+    (build-system python-build-system)
+    (home-page
+      "https://github.com/trezor/python-mnemonic")
+    (synopsis "Implementation of Bitcoin BIP-0039")
+    (description
+      "Implementation of Bitcoin BIP-0039")
+    (license license:expat)))
+
+(define-public python-lib-agent
+  (package
+    (name "python-lib-agent")
+    (version "1.0.3")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "lib-agent" version))
+        (sha256
+          (base32
+            "07vrmgnbwsadqih4icml8v7jb4x8sm4vfcf5qqxdar0cakl96ml4"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-backports.shutil-which"
+         ,python-backports.shutil-which)
+        ("python-configargparse" ,python-configargparse)
+        ("python-daemon" ,python-daemon)
+        ("python-docutils" ,python-docutils)
+        ("python-ecdsa" ,python-ecdsa)
+        ("python-mnemonic" ,python-mnemonic)
+        ("python-pycryptodome" ,python-pycryptodome)
+        ("python-pymsgbox" ,python-pymsgbox)
+        ("python-pynacl" ,python-pynacl)
+        ("python-semver" ,python-semver)
+        ("python-unidecode" ,python-unidecode)
+        ("python-wheel" ,python-wheel)))
+    (home-page
+      "http://github.com/onlykey/onlykey-agent")
+    (synopsis
+      "Using OnlyKey as hardware SSH and GPG agent")
+    (description
+      "Using OnlyKey as hardware SSH and GPG agent")
+    (license license:lgpl3)))
+
+(define-public python-onlykey-agent
+  (package
+    (name "python-onlykey-agent")
+    (version "1.1.12")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "onlykey-agent" version))
+        (sha256
+          (base32
+            "1586zhpph79s12alnyj1iiiwj0c5h1z8na2lqczf560p5mca6gxw"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-lib-agent" ,python-lib-agent)
+        ("python-onlykey" ,python-onlykey)))
+    (home-page
+      "http://github.com/trustcrypto/onlykey-agent")
+    (synopsis
+      "Using OnlyKey as hardware SSH/GPG agent")
+    (description
+      "Using OnlyKey as hardware SSH/GPG agent")
+    (license license:lgpl3)))
