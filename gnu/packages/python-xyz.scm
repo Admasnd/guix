@@ -218,6 +218,7 @@
   #:use-module (gnu packages serialization)
   #:use-module (gnu packages libusb)
   #:use-module (gnu packages security-token)
+  #:use-module (gnu packages protobuf)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
@@ -27000,6 +27001,125 @@ YYYY-MM-DD at the beginning of the file or directory name.")
       "Implementation of Bitcoin BIP-0039")
     (license license:expat)))
 
+(define-public python-trezor
+  (package
+    (name "python-trezor")
+    (version "0.12.3")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "trezor" version))
+        (sha256
+          (base32
+            "1bl57vp6bh5pwf5p86ja2kmz1iszyddvnyfccbfgdf1m6hrrrhq2"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-attrs" ,python-attrs)
+        ("python-click" ,python-click)
+        ("python-construct" ,python-construct)
+        ("python-ecdsa" ,python-ecdsa)
+        ("python-libusb1" ,python-libusb1)
+        ("python-mnemonic" ,python-mnemonic)
+        ("python-requests" ,python-requests)
+        ("python-setuptools" ,python-setuptools)
+        ("python-typing-extensions"
+         ,python-typing-extensions)))
+    (home-page
+      "https://github.com/trezor/trezor-firmware/tree/master/python")
+    (synopsis
+      "Python library for communicating with Trezor Hardware Wallet")
+    (description
+      "Python library for communicating with Trezor Hardware Wallet")
+    (license license:lgpl3)))
+
+(define-public python-keepkey
+  (package
+    (name "python-keepkey")
+    (version "6.3.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "keepkey" version))
+        (sha256
+          (base32
+            "07mvy1bjd75wzkfvbj7d3pyqcc562myzb8204vjf7v4mw5ifiwff"))))
+    (build-system python-build-system)
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (invoke "python" "-m" "unittest" "discover" "tests/unit")))))))
+    (propagated-inputs
+      `(("python-ecdsa" ,python-ecdsa)
+        ("python-hidapi" ,python-hidapi)
+        ("python-libusb1" ,python-libusb1)
+        ("python-mnemonic" ,python-mnemonic)
+        ("python-protobuf" ,python-protobuf)))
+    (native-inputs
+     `(("python-semver" ,python-semver)))
+    (home-page
+      "https://github.com/keepkey/python-keepkey")
+    (synopsis
+      "Python library for communicating with KeepKey Hardware Wallet")
+    (description
+      "Python library for communicating with KeepKey Hardware Wallet")
+    (license license:lgpl3)))
+
+(define-public python-u2flib-host
+  (package
+    (name "python-u2flib-host")
+    (version "3.0.3")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "python-u2flib-host" version))
+        (sha256
+          (base32
+            "02pwafd5kyjpc310ys0pgnd0adff1laz18naxxwsfrllqafqnrxb"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-hidapi" ,python-hidapi)
+        ("python-requests" ,python-requests)))
+    (native-inputs
+      `(("python-cryptography" ,python-cryptography)))
+    (home-page
+      "https://github.com/Yubico/python-u2flib-host")
+    (synopsis "Python based U2F host library")
+    (description "Python based U2F host library")
+    (license license:bsd-2)))
+
+(define-public python-ledgerblue
+  (package
+    (name "python-ledgerblue")
+    (version "0.1.37")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "ledgerblue" version))
+        (sha256
+          (base32
+            "0m4q2r3049iks6910ha5796cdbp9scww5v28kvnld62bpp4lajgk"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-ecpy" ,python-ecpy)
+        ("python-future" ,python-future)
+        ("python-hidapi" ,python-hidapi)
+        ("python-pillow" ,python-pillow)
+        ("python-protobuf" ,python-protobuf)
+        ("python-pycryptodomex" ,python-pycryptodomex)
+        ("python-u2flib-host" ,python-u2flib-host)
+        ("python-websocket-client"
+         ,python-websocket-client)))
+    (home-page
+      "https://github.com/LedgerHQ/blue-loader-python")
+    (synopsis
+      "Python library to communicate with Ledger Blue/Nano S")
+    (description
+      "Python library to communicate with Ledger Blue/Nano S")
+    (license license:asl2.0)))
+
 (define-public python-lib-agent
   (package
     (name "python-lib-agent")
@@ -27026,6 +27146,11 @@ YYYY-MM-DD at the beginning of the file or directory name.")
         ("python-semver" ,python-semver)
         ("python-unidecode" ,python-unidecode)
         ("python-wheel" ,python-wheel)))
+    (native-inputs 
+     `(("python-trezor" ,python-trezor)
+       ("python-keepkey" ,python-keepkey)
+       ("python-onlykey" ,python-onlykey)
+       ("python-ledgerblue" ,python-ledgerblue)))
     (home-page
       "http://github.com/onlykey/onlykey-agent")
     (synopsis
