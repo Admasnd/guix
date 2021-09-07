@@ -219,6 +219,7 @@
   #:use-module (gnu packages libusb)
   #:use-module (gnu packages security-token)
   #:use-module (gnu packages protobuf)
+  #:use-module (gnu packages finance)
   #:use-module (guix packages)
   #:use-module (guix download)
   #:use-module (guix git-download)
@@ -27089,36 +27090,6 @@ YYYY-MM-DD at the beginning of the file or directory name.")
     (synopsis "Python based U2F host library")
     (description "Python based U2F host library")
     (license license:bsd-2)))
-
-(define-public python-ledgerblue
-  (package
-    (name "python-ledgerblue")
-    (version "0.1.37")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (pypi-uri "ledgerblue" version))
-        (sha256
-          (base32
-            "0m4q2r3049iks6910ha5796cdbp9scww5v28kvnld62bpp4lajgk"))))
-    (build-system python-build-system)
-    (propagated-inputs
-      `(("python-ecpy" ,python-ecpy)
-        ("python-future" ,python-future)
-        ("python-hidapi" ,python-hidapi)
-        ("python-pillow" ,python-pillow)
-        ("python-protobuf" ,python-protobuf)
-        ("python-pycryptodomex" ,python-pycryptodomex)
-        ("python-u2flib-host" ,python-u2flib-host)
-        ("python-websocket-client"
-         ,python-websocket-client)))
-    (home-page
-      "https://github.com/LedgerHQ/blue-loader-python")
-    (synopsis
-      "Python library to communicate with Ledger Blue/Nano S")
-    (description
-      "Python library to communicate with Ledger Blue/Nano S")
-    (license license:asl2.0)))
 
 (define-public python-lib-agent
   (package
