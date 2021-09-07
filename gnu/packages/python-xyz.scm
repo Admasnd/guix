@@ -26936,14 +26936,14 @@ YYYY-MM-DD at the beginning of the file or directory name.")
 (define-public python-onlykey
   (package
     (name "python-onlykey")
-    (version "1.2.5")
+    (version "1.2.6")
     (source
       (origin
         (method url-fetch)
         (uri (pypi-uri "onlykey" version))
         (sha256
-          (base32
-            "0054ma1bccx4nxz2s5j50l6h6ilgi8i74hvcnjf9j5wgfs0zbypc"))))
+         (base32
+          "1mq02x6qncsjqadqjakywdnfclsv7jaabfk1kzwrm5x05c0hbzji"))))
     (build-system python-build-system)
     (propagated-inputs
       `(("python-aenum" ,python-aenum)
