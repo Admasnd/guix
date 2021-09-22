@@ -3455,43 +3455,57 @@ is a library for creating graphical user interfaces.")
   (sbcl-package->ecl-package sbcl-cl-cffi-gtk))
 
 (define-public sbcl-cl-webkit
-  (let ((commit "cfc4f01ee806169d824750b4014653a93af9353d"))
-    (package
-      (name "sbcl-cl-webkit")
-      (version (git-version "2.4" "16" commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/joachifm/cl-webkit")
-               (commit commit)))
-         (file-name (git-file-name "cl-webkit" version))
-         (sha256
-          (base32
-           "18n90m33bi6arnjmwr3q3m0arwzr0kdnydlv4if82crvaagd6m89"))))
-      (build-system asdf-build-system/sbcl)
-      (inputs
-       `(("cffi" ,sbcl-cffi)
-         ("cl-cffi-gtk" ,sbcl-cl-cffi-gtk)
-         ("webkitgtk" ,webkitgtk)))
-      (arguments
-       `(#:asd-systems '("cl-webkit2")
-         #:phases
-         (modify-phases %standard-phases
-           (add-after 'unpack 'fix-paths
-             (lambda* (#:key inputs #:allow-other-keys)
-               (substitute* "webkit2/webkit2.init.lisp"
-                 (("libwebkit2gtk" all)
-                  (string-append
-                   (assoc-ref inputs "webkitgtk") "/lib/" all))))))))
-      (home-page "https://github.com/joachifm/cl-webkit")
-      (synopsis "Binding to WebKitGTK+ for Common Lisp")
-      (description
-       "@command{cl-webkit} is a binding to WebKitGTK+ for Common Lisp,
+  (package
+    (name "sbcl-cl-webkit")
+    (version "3.0.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/joachifm/cl-webkit")
+             (commit version)))
+       (file-name (git-file-name "cl-webkit" version))
+       (sha256
+        (base32
+         "015xry1cvbgspfzz35ifz2qscz946ljhj2z8rzjscy9v8fgnjsdk"))))
+    (build-system asdf-build-system/sbcl)
+    (inputs
+     `(("cffi" ,sbcl-cffi)
+       ("cl-cffi-gtk" ,sbcl-cl-cffi-gtk)
+       ("webkitgtk" ,webkitgtk)))
+    (native-inputs
+     `(;; Tests seem to need Xorg.
+       ;; ("xorg-server" ,xorg-server-for-tests)
+       ("calispel" ,sbcl-calispel)
+       ("fiveam" ,sbcl-fiveam)
+       ("float-features" ,sbcl-float-features)))
+    (arguments
+     `(#:asd-systems '("cl-webkit2")
+       #:tests? #f                      ; TODO: Tests hang, why?
+       #:phases
+       (modify-phases %standard-phases
+         ;; The following phase is needed for tests:
+         ;; (add-before 'check 'start-xorg-server
+         ;;   (lambda* (#:key inputs #:allow-other-keys)
+         ;;     ;; The test suite requires a running X server.
+         ;;     (system (string-append (assoc-ref inputs "xorg-server")
+         ;;                            "/bin/Xvfb :1 &"))
+         ;;     (setenv "DISPLAY" ":1")
+         ;;     #t))
+         (add-after 'unpack 'fix-paths
+           (lambda* (#:key inputs #:allow-other-keys)
+             (substitute* "webkit2/webkit2.init.lisp"
+               (("libwebkit2gtk" all)
+                (string-append
+                 (assoc-ref inputs "webkitgtk") "/lib/" all))))))))
+    (home-page "https://github.com/joachifm/cl-webkit")
+    (synopsis "Binding to WebKitGTK+ for Common Lisp")
+    (description
+     "@command{cl-webkit} is a binding to WebKitGTK+ for Common Lisp,
 currently targeting WebKit version 2.  The WebKitGTK+ library adds web
 browsing capabilities to an application, leveraging the full power of the
 WebKit browsing engine.")
-      (license license:expat))))
+    (license license:expat)))
 
 (define-public cl-webkit
   (sbcl-package->cl-source-package sbcl-cl-webkit))
@@ -5523,6 +5537,39 @@ the CFFI approach used by burgled-batteries, but has the same goal.")
 
 (define-public ecl-py4cl
   (sbcl-package->ecl-package sbcl-py4cl))
+
+(define-public sbcl-schemeish
+  (let ((commit "dff57bafae5d0cffa104c8fdc4146502f32d7f85")
+        (revision "1"))
+    (package
+      (name "sbcl-schemeish")
+      (version (git-version "0.0.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/chebert/schemeish")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0q9b07spmhg1b576cnnacvkf7zr3mab2rdydfylbn92y9mms9vyj"))))
+      (build-system asdf-build-system/sbcl)
+      (inputs
+       `(("trivial-arguments" ,sbcl-trivial-arguments)))
+      (synopsis "Scheme style syntax/macros/functions for Common Lisp")
+      (description
+       "Schemeish implements several useful Scheme constructs for Common Lisp.
+These include named-let, define, scheme argument lists, and a shortcut to
+FUNCALL with [] instead of ().")
+      (home-page "https://github.com/chebert/schemeish")
+      ;; MIT License
+      (license license:expat))))
+
+(define-public cl-schemeish
+  (sbcl-package->cl-source-package sbcl-schemeish))
+
+(define-public ecl-schemeish
+  (sbcl-package->ecl-package sbcl-schemeish))
 
 (define-public sbcl-parse-declarations
   (let ((commit "549aebbfb9403a7fe948654126b9c814f443f4f2")
@@ -10719,6 +10766,36 @@ If features:
 
 (define-public ecl-sycamore
   (sbcl-package->ecl-package sbcl-sycamore))
+
+(define-public sbcl-funds
+  (let ((commit "6a93695a83d6e21f7ae1351f9b07ee01fa0b487f")
+        (revision "1"))
+    (package
+      (name "sbcl-funds")
+      (version (git-version "1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/charJe/funds")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0lhzghngihy83njcnhjiqg10lyw8zxfpmg6ly8sycd4vyiw2i249"))))
+      (build-system asdf-build-system/sbcl)
+      (synopsis "Purely functional data structure library in Common Lisp")
+      (description
+       "Funds provides portable, purely functional data structures in Common
+Lisp.  It includes tree based implementations for Array, Hash, Queue, Stack, and
+Heap.")
+      (home-page "https://common-lisp.net/project/funds/")
+      (license license:asl2.0))))
+
+(define-public cl-funds
+  (sbcl-package->cl-source-package sbcl-funds))
+
+(define-public ecl-funds
+  (sbcl-package->ecl-package sbcl-funds))
 
 (define-public sbcl-trivial-package-local-nicknames
   (package

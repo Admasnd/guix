@@ -32,7 +32,7 @@
 ;;; Copyright © 2020 Vincent Legoll <vincent.legoll@gmail.com>
 ;;; Copyright © 2020 Justus Winter <justus@sequoia-pgp.org>
 ;;; Copyright © 2020 Eric Brown <ecbrown@ericcbrown.com>
-;;; Copyright © 2020 Maxim Cournoyer <maxim.cournoyer@gmail.com>
+;;; Copyright © 2020, 2021 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2020 Michael Rohleder <mike@rohleder.de>
 ;;; Copyright © 2020, 2021 Alexey Abramov <levenson@mmer.org>
 ;;; Copyright © 2020 Tim Gesthuizen <tim.gesthuizen@yahoo.de>
@@ -167,6 +167,7 @@
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system go)
   #:use-module (guix build-system guile)
+  #:use-module (guix build-system emacs)
   #:use-module (guix build-system meson)
   #:use-module (guix build-system perl)
   #:use-module (guix build-system python)
@@ -260,18 +261,16 @@ example, modify the message headers or body, or encrypt or sign the message.")
 (define-public mailutils
   (package
     (name "mailutils")
-    (version "3.10")
+    (version "3.13")
     (source (origin
              (method url-fetch)
              (uri (string-append "mirror://gnu/mailutils/mailutils-"
                                  version ".tar.xz"))
              (sha256
               (base32
-               "17smrxjdgbbzbzakik30vj46q4iib85ksqhb82jr4vjp57akszh9"))
+               "1iwl82d6aa2acsdxbqh1s5xx44sg83b4yxqik408m1s9rcfrf86r"))
              (patches
-              ;; Fixes https://issues.guix.gnu.org/43088.
-              (search-patches "mailutils-fix-uninitialized-variable.patch"
-                              "mailutils-variable-lookup.patch"))))
+              (search-patches "mailutils-variable-lookup.patch"))))
     (build-system gnu-build-system)
     (arguments
      `(#:phases
@@ -295,8 +294,9 @@ example, modify the message headers or body, or encrypt or sign the message.")
              ;; The 'pipeact.at' tests generate a shell script; make
              ;; sure it uses the right shell.
              (substitute* '("sieve/tests/testsuite"
-                            "mh/tests/testsuite")
-               (("#! /bin/sh")
+                            "mh/tests/testsuite"
+                            "libmailutils/tests/lock.at")
+               (("#! ?/bin/sh")
                 (string-append "#!" (which "sh"))))
 
              (substitute* "mh/tests/testsuite"
@@ -328,8 +328,9 @@ example, modify the message headers or body, or encrypt or sign the message.")
                  (format port "Path: ~a/Mail-for-tests~%"
                          (getcwd))))
 
-             #t)))
-       ;; TODO: Add `--with-sql'.
+             (substitute* "imap4d/tests/testclient.c"
+               (("\"/bin/sh\"")
+                (string-append "\"" (which "sh") "\""))))))
        #:configure-flags
        (list "--sysconfdir=/etc"
 
@@ -341,16 +342,20 @@ example, modify the message headers or body, or encrypt or sign the message.")
                                            (package-inputs this-package))
                                (("guile" guile)
                                 (version-major+minor
-                                 (package-version guile))))))
-
-       #:parallel-tests? #f))
+                                 (package-version guile))))))))
     (native-inputs
-     `(("perl" ,perl)                           ;for 'gylwrap'
+     ;; Regeneration of the build system is triggered by touching the
+     ;; 'libmailutils/tests/lock.at' file.
+     `(("autoconf" ,autoconf)
+       ("automake" ,automake)
+       ("gettext" ,gettext-minimal)
+       ("libtool" ,libtool)
+       ("m4" ,m4)
+       ("perl" ,perl)                           ;for 'gylwrap'
        ("texinfo" ,texinfo)
        ("dejagnu" ,dejagnu)))
     (inputs
-     `(("m4" ,m4)
-       ("guile" ,guile-3.0)
+     `(("guile" ,guile-3.0)
        ("gsasl" ,gsasl)
        ("gnutls" ,gnutls)
        ("ncurses" ,ncurses)
@@ -358,7 +363,6 @@ example, modify the message headers or body, or encrypt or sign the message.")
        ("linux-pam" ,linux-pam)
        ("libltdl" ,libltdl)
        ("gdbm" ,gdbm)
-
        ;; Required for SEARCH CHARSET.
        ("libiconv" ,libiconv)
        ("libunistring" ,libunistring)))
@@ -369,7 +373,24 @@ example, modify the message headers or body, or encrypt or sign the message.")
 processing electronic mail.  It contains both utilities and server daemons
 and all operate in a protocol-agnostic way.  The underlying libraries are
 also available, simplifying the addition of mail capabilities to new
-software.")
+software.  GNU Mailutils provides the following commands:
+@itemize @command
+@item dotlock
+@item decodemail
+@item frm
+@item from
+@item guimb
+@item mail
+@item mailutils
+@item mailutils-config
+@item messages
+@item mimeview
+@item movemail
+@item popauth
+@item putmail
+@item readmsg
+@item sieve
+@end itemize")
     (license
      ;; Libraries are under LGPLv3+, and programs under GPLv3+.
      (list license:gpl3+ license:lgpl3+))))
@@ -500,7 +521,7 @@ to run without any changes.")
 (define-public fetchmail
   (package
     (name "fetchmail")
-    (version "6.4.21")
+    (version "6.4.22")
     (source
      (origin
        (method url-fetch)
@@ -508,7 +529,7 @@ to run without any changes.")
                            (version-major+minor version) "/"
                            "fetchmail-" version ".tar.xz"))
        (sha256
-        (base32 "07cxr5137hvrk8jfgn4wd6sq9361c3d40w8krnjxm8fpmwf9qiba"))))
+        (base32 "111cc6zfmb53f2a844iiyp3j2symcg8xd4m2kwb04mj3b6yihs6c"))))
     (build-system gnu-build-system)
     (inputs
      `(("openssl" ,openssl)))
@@ -535,7 +556,7 @@ aliasing facilities to work just as they would on normal mail.")
 (define-public mutt
   (package
     (name "mutt")
-    (version "2.1.1")
+    (version "2.1.3")
     (source (origin
              (method url-fetch)
              (uri (list
@@ -545,7 +566,7 @@ aliasing facilities to work just as they would on normal mail.")
                                    version ".tar.gz")))
              (sha256
               (base32
-               "0jjjvqkqmpj55v111p1a1i2ry7mpd1bpphn1bhvlr18rgw7xdrja"))
+               "0z74slnq3y9wr1xr07jigz4n8dgxhk9qb0787sd0j6wj9g4rqxgg"))
              (patches (search-patches "mutt-store-references.patch"))))
     (build-system gnu-build-system)
     (inputs
@@ -1332,41 +1353,28 @@ invoking @command{notifymuch} from the post-new hook.")
 (define-public notmuch
   (package
     (name "notmuch")
-    (version "0.32.2")
+    (version "0.33.1")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://notmuchmail.org/releases/notmuch-"
                                   version ".tar.xz"))
               (sha256
                (base32
-                "1myylb19hj5nb1vriqng252vfjwwkgbi3gxj93pi2q1fzyw7w2lf"))))
+                "1lhhkg9aw2ychj8lvkmk4bnj7rjz3v9w9r7sdp8bqjpfv41mz41d"))))
     (build-system gnu-build-system)
     (arguments
-     `(#:modules ((guix build gnu-build-system)
-                  ((guix build emacs-build-system) #:prefix emacs:)
-                  (guix build utils))
-       #:imported-modules (,@%gnu-build-system-modules
-                           (guix build emacs-build-system)
-                           (guix build emacs-utils))
-       #:make-flags
+     `(#:make-flags
        (list "V=1"                      ; verbose test output
              "NOTMUCH_TEST_TIMEOUT=1h") ; don't fail on slow machines
        #:phases (modify-phases %standard-phases
-                  (add-after 'unpack 'patch-notmuch-lib.el
-                    (lambda _
-                      (substitute* "emacs/notmuch-lib.el"
-                        (("/bin/sh") (which "sh")))))
                   (replace 'configure
                     (lambda* (#:key outputs #:allow-other-keys)
-                      (setenv "CC" "gcc")
+                      (setenv "CC" ,(cc-for-target))
                       (setenv "CONFIG_SHELL" (which "sh"))
-
-                      (let* ((out (assoc-ref outputs "out"))
-                             (elisp (emacs:elpa-directory out)))
+                      (let* ((out (assoc-ref outputs "out")))
                         (invoke "./configure"
                                 (string-append "--prefix=" out)
-                                (string-append "--emacslispdir=" elisp)
-                                (string-append "--emacsetcdir=" elisp)))))
+                                "--without-emacs"))))
                   (add-before 'check 'disable-failing-tests
                     ;; FIXME: Investigate why these tests are failing,
                     ;; and try removing this for notmuch versions > 0.31.
@@ -1375,21 +1383,20 @@ invoking @command{notifymuch} from the post-new hook.")
                         (("\\$NOTMUCH_GMIME_X509_CERT_VALIDITY") "0"))))
                   (add-before 'check 'prepare-test-environment
                     (lambda _
-                      (setenv "TEST_CC" "gcc")
+                      (setenv "TEST_CC" ,(cc-for-target))
                       ;; Patch various inline shell invocations.
                       (substitute* (find-files "test" "\\.sh$")
-                        (("/bin/sh") (which "sh")))))
-                  (add-after 'install 'make-autoloads
-                    (assoc-ref emacs:%standard-phases 'make-autoloads)))))
+                        (("/bin/sh") (which "sh"))))))))
     (native-inputs
      `(("bash-completion" ,bash-completion)
-       ("emacs" ,emacs-no-x)    ; -minimal lacks libxml, needed for some tests
        ("pkg-config" ,pkg-config)
        ("python" ,python)
        ("python-docutils" ,python-docutils)
        ("sphinx" ,python-sphinx)
+       ("texinfo" ,texinfo)
 
        ;; The following are required for tests only.
+       ("emacs" ,emacs-no-x)    ; -minimal lacks libxml, needed for some tests
        ("which" ,which)
        ("dtach" ,dtach)
        ("gnupg" ,gnupg)
@@ -1407,6 +1414,32 @@ invoking @command{notifymuch} from the post-new hook.")
      "Notmuch is a command-line based program for indexing, searching, read-
 ing, and tagging large collections of email messages.")
     (license license:gpl3+)))
+
+(define-public emacs-notmuch
+  (package
+    (inherit notmuch)
+    (name "emacs-notmuch")
+    (build-system emacs-build-system)
+    (native-inputs '())
+    (inputs
+     `(("notmuch" ,notmuch)))
+    (arguments
+     `(#:exclude (cons* "make-deps.el" "rstdoc.el" %default-exclude)
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'chdir
+           (lambda _
+             (chdir "emacs")))
+         (add-after 'chdir 'patch-paths
+           (lambda* (#:key inputs #:allow-other-keys)
+             (let ((notmuch (assoc-ref inputs "notmuch")))
+               (substitute* "notmuch-lib.el"
+                 (("\"notmuch\"")
+                  (string-append "\"" notmuch "/bin/notmuch\"")))))))))
+    (synopsis "Run Notmuch within Emacs")
+    (description
+     "This package provides an Emacs-based interface to the Notmuch mail
+system.")))
 
 (define-public notmuch-addrlookup-c
   (package

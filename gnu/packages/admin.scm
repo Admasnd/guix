@@ -1669,7 +1669,7 @@ system administrator.")
 (define-public sudo
   (package
     (name "sudo")
-    (version "1.9.7p2")
+    (version "1.9.8p2")
     (source (origin
               (method url-fetch)
               (uri
@@ -1679,12 +1679,11 @@ system administrator.")
                                     version ".tar.gz")))
               (sha256
                (base32
-                "1a7w99mlpa7kb7zfqkhvafli0a3xhz50kws25y2sg2dzbmrfxd98"))
+                "0b8gd15l2g22w4fhhz0gzmq5c8370klanmy2c1p3px6yly6qnfwy"))
               (modules '((guix build utils)))
               (snippet
                '(begin
-                  (delete-file-recursively "lib/zlib")
-                  #t))))
+                  (delete-file-recursively "lib/zlib")))))
     (build-system gnu-build-system)
     (outputs (list "out"))
     (arguments
@@ -1737,8 +1736,7 @@ system administrator.")
              ;; not the task of the build system, and fails.
              (substitute* "plugins/sudoers/Makefile.in"
                (("^pre-install:" match)
-                (string-append match "\ndisabled-" match)))
-             #t)))
+                (string-append match "\ndisabled-" match))))))
 
        ;; XXX: The 'testsudoers' test series expects user 'root' to exist, but
        ;; the chroot's /etc/passwd doesn't have it.  Turn off the tests.
@@ -4416,7 +4414,7 @@ file-types for easier parsing in scripts.")
 (define-public jtbl
   (package
     (name "jtbl")
-    (version "1.1.6")
+    (version "1.1.7")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -4425,7 +4423,7 @@ file-types for easier parsing in scripts.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1zzd7rd63xva50f22d1rfja4r302aizrafarhwm67vv181swvdya"))))
+                "19i21fqz2m40cds9pb17brjxkczqagmx2f7mfb0xdvbygaply5wz"))))
     (build-system python-build-system)
     (inputs
      `(("python-tabulate" ,python-tabulate)))

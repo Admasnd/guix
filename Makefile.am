@@ -254,6 +254,7 @@ MODULES =					\
   guix/import/egg.scm   			\
   guix/import/elpa.scm   			\
   guix/import/gem.scm				\
+  guix/import/git.scm                           \
   guix/import/github.scm   			\
   guix/import/gnome.scm				\
   guix/import/gnu.scm				\
@@ -370,6 +371,10 @@ AUX_FILES =						\
   gnu/packages/aux-files/chromium/master-preferences.json		\
   gnu/packages/aux-files/emacs/guix-emacs.el		\
   gnu/packages/aux-files/guix.vim			\
+  gnu/packages/aux-files/linux-libre/5.14-arm.conf	\
+  gnu/packages/aux-files/linux-libre/5.14-arm64.conf	\
+  gnu/packages/aux-files/linux-libre/5.14-i686.conf	\
+  gnu/packages/aux-files/linux-libre/5.14-x86_64.conf	\
   gnu/packages/aux-files/linux-libre/5.13-arm.conf	\
   gnu/packages/aux-files/linux-libre/5.13-arm64.conf	\
   gnu/packages/aux-files/linux-libre/5.13-i686.conf	\
@@ -469,6 +474,7 @@ SCM_TESTS =					\
   tests/graph.scm				\
   tests/gremlin.scm				\
   tests/hackage.scm				\
+  tests/import-git.scm				\
   tests/import-utils.scm			\
   tests/inferior.scm				\
   tests/lint.scm				\
@@ -620,9 +626,11 @@ EXTRA_DIST +=						\
   .guix-authorizations					\
   .guix-channel						\
   scripts/guix.in					\
+  etc/disarchive-manifest.scm				\
   etc/guix-install.sh					\
   etc/news.scm						\
   etc/release-manifest.scm				\
+  etc/source-manifest.scm				\
   etc/system-tests.scm					\
   etc/historical-authorizations				\
   build-aux/build-self.scm				\

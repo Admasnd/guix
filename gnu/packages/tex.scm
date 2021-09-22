@@ -3639,6 +3639,42 @@ font metrics.  The bundle as a whole is part of the LaTeX required set of
 packages.")
     (license license:lppl1.2+)))
 
+;; TODO: this should supersede texlive-latex-psnfss, but we can't do this
+;; before the next rebuild cycle.
+(define-public texlive-psnfss
+  (let ((template (simple-texlive-package
+                   "texlive-psnfss"
+                   (list "/doc/latex/psnfss/"
+                         "/source/latex/psnfss/"
+                         "/fonts/map/dvips/psnfss/"
+                         ;; Only the sty files are generated.  We need all the .fd
+                         ;; files.
+                         "/tex/latex/psnfss/")
+                   (base32
+                    "04y7v4bghpzky6c3l6qadx7s47m69jh1y615g91rxcn8z3r190di")
+                   #:trivial? #false)))
+    (package
+      (inherit template)
+      (arguments
+       (substitute-keyword-arguments (package-arguments template)
+         ((#:tex-directory _ '())
+          "latex/psnfss")
+         ((#:phases phases)
+          `(modify-phases ,phases
+             (add-after 'unpack 'chdir
+               (lambda _ (chdir "source/latex/psnfss")))))))
+      (home-page "https://www.ctan.org/pkg/psnfss")
+      (synopsis "Font support for common PostScript fonts")
+      (description
+       "The PSNFSS collection includes a set of files that provide a complete
+working setup of the LaTeX font selection scheme (NFSS2) for use with common
+PostScript fonts.  It covers the so-called \"Base\" fonts (which are built
+into any Level 2 PostScript printing device and the Ghostscript interpreter)
+and a number of free fonts.  It provides font definition files, macros and
+font metrics.  The bundle as a whole is part of the LaTeX required set of
+packages.")
+      (license license:lppl1.2+))))
+
 ;; For user profiles
 (define-public texlive-base
   (let ((default-packages
@@ -6151,55 +6187,42 @@ requires the suffix package, which in turn requires that it runs under
 e-TeX.")
     (license license:lppl1.3+)))
 
-(define-public texlive-generic-pdftex
+(define-public texlive-pdftex
   (package
-    (name "texlive-generic-pdftex")
-    (version (number->string %texlive-revision))
-    (source (origin
-              (method svn-fetch)
-              (uri (svn-reference
-                    (url (string-append "svn://www.tug.org/texlive/tags/"
-                                        %texlive-tag "/Master/texmf-dist/"
-                                        "/tex/generic/pdftex"))
-                    (revision %texlive-revision)))
-              (file-name (string-append name "-" version "-checkout"))
-              (sha256
-               (base32
-                "0k68zmqzs4qvrqxdwsrawbjb14hxqjfamq649azvai0jjxdpkljd"))))
-    (build-system trivial-build-system)
-    (arguments
-     `(#:modules ((guix build utils))
-       #:builder
-       (begin
-         (use-modules (guix build utils))
-         (let ((target (string-append (assoc-ref %outputs "out")
-                                      "/share/texmf-dist/tex/generic/pdftex"))
-               (target-map (string-append (assoc-ref %outputs "out")
-                                      "/share/texmf-dist/fonts/map/pdftex")))
-           (mkdir-p target)
-           (copy-recursively (assoc-ref %build-inputs "source") target)
-           (mkdir-p target-map)
-           (copy-recursively (assoc-ref %build-inputs "pdftex-map") target-map)
-           #t))))
-    (native-inputs
-     `(("pdftex-map"
-        ,(origin
-           (method svn-fetch)
-           (uri (svn-reference
-                 (url (string-append "svn://www.tug.org/texlive/tags/"
-                                     %texlive-tag "/Master/texmf-dist/"
-                                     "/fonts/map/pdftex"))
-                 (revision %texlive-revision)))
-           (file-name (string-append name "-map-" version "-checkout"))
-           (sha256
-            (base32
-             "03rfif2631pgd8g1ar4xblcdh078kky7fvw3kfsj5a47rxxgicp2"))))))
+    (inherit (simple-texlive-package
+              "texlive-pdftex"
+              (list "/doc/pdftex/"
+                    "/doc/man/man1/pdftex.1"
+                    "/doc/man/man1/pdfetex.1"
+                    "/fonts/map/dvips/dummy-space/dummy-space.map"
+                    "/fonts/tfm/public/pdftex/dummy-space.tfm"
+                    "/fonts/type1/public/pdftex/dummy-space.pfb"
+                    "/scripts/simpdftex/simpdftex"
+                    "/tex/generic/config/pdftex-dvi.tex"
+                    "/tex/generic/pdftex/glyphtounicode.tex"
+                    "/tex/generic/pdftex/pdfcolor.tex")
+              (base32
+               "0wsgbl0jrqc1qzgf23dla6b95lv2h8x6xvs5466d8jdrih6pwriq")
+              #:trivial? #t))
+    ;; TODO: add this missing package:
+    ;; dehyph
+    (propagated-inputs
+     `(("texlive-cm" ,texlive-cm)
+       ("texlive-etex" ,texlive-etex)
+       ("texlive-fonts-knuth-lib" ,texlive-fonts-knuth-lib)
+       ("texlive-hyphen-base" ,texlive-hyphen-base)
+       ("texlive-kpathsea" ,texlive-kpathsea)
+       ("texlive-tex-ini-files" ,texlive-tex-ini-files)
+       ("texlive-tex-plain" ,texlive-tex-plain)))
     (home-page "https://www.ctan.org/pkg/pdftex")
     (synopsis "TeX extension for direct creation of PDF")
     (description
      "This package provides an extension of TeX which can be configured to
 directly generate PDF documents instead of DVI.")
     (license license:gpl2+)))
+
+(define-public texlive-generic-pdftex
+  (deprecated-package "texlive-generic-pdftex" texlive-pdftex))
 
 (define texlive-texmf
   (package
@@ -6581,7 +6604,7 @@ develop documents with LaTeX, in a single application.")
                                         texlive-fonts-adobe-zapfding
                                         texlive-fonts-knuth-lib
                                         texlive-fonts-mflogo-font
-                                        texlive-generic-pdftex)))
+                                        texlive-pdftex)))
        ("automake" ,automake)))
     (home-page "https://www.gnu.org/software/teximpatient/")
     (synopsis "Book on TeX, plain TeX and Eplain")
@@ -7253,6 +7276,9 @@ package, such as @command{natbib} as well).")
               (base32
                "09l5ymgz48s3hyn776l01g3isk3dnhrj1vdavdw4qq4kfxxpqdn9")
               #:trivial? #t))
+    ;; This provides charter.map.
+    (propagated-inputs
+     `(("texlive-psnfss" ,texlive-psnfss)))
     (home-page "https://www.ctan.org/pkg/charter")
     (synopsis "Charter fonts for TeX")
     (description "This package provides a copy of the Charter Type-1 fonts
@@ -7265,38 +7291,101 @@ Support for use with LaTeX is available in @code{freenfss}, part of
 (define-public texlive-fonts-charter
   (deprecated-package "texlive-fonts-charter" texlive-charter))
 
-(define-public texlive-context-base
+(define-public texlive-context
   (package
-    (name "texlive-context-base")
-    (version (number->string %texlive-revision))
-    (source (origin
-              (method svn-fetch)
-              (uri (svn-reference
-                    (url (string-append "svn://www.tug.org/texlive/tags/"
-                                        %texlive-tag "/Master/texmf-dist/"
-                                        "/tex/context/base"))
-                    (revision %texlive-revision)))
-              (file-name (string-append name "-" version "-checkout"))
-              (sha256
-               (base32
-                "0d7d74giz5knvj4rj6mbzd6c05mwg9jrxab86jxdqbc3jy7cl4kz"))))
-    (build-system trivial-build-system)
-    (arguments
-     `(#:modules ((guix build utils))
-       #:builder
-       (begin
-         (use-modules (guix build utils))
-         (let ((target (string-append (assoc-ref %outputs "out")
-                                      "/share/texmf-dist/tex/context/case")))
-           (mkdir-p target)
-           (copy-recursively (assoc-ref %build-inputs "source") target)
-           #t))))
+    (inherit (simple-texlive-package
+              "texlive-context"
+              (list "/doc/context/"
+                    "/doc/man/man1/context.1"
+                    "/doc/man/man1/luatools.1"
+                    "/doc/man/man1/mtx-babel.1"
+                    "/doc/man/man1/mtx-base.1"
+                    "/doc/man/man1/mtx-bibtex.1"
+                    "/doc/man/man1/mtx-cache.1"
+                    "/doc/man/man1/mtx-chars.1"
+                    "/doc/man/man1/mtx-check.1"
+                    "/doc/man/man1/mtx-colors.1"
+                    "/doc/man/man1/mtx-context.1"
+                    "/doc/man/man1/mtx-dvi.1"
+                    "/doc/man/man1/mtx-epub.1"
+                    "/doc/man/man1/mtx-evohome.1"
+                    "/doc/man/man1/mtx-fcd.1"
+                    "/doc/man/man1/mtx-flac.1"
+                    "/doc/man/man1/mtx-fonts.1"
+                    "/doc/man/man1/mtx-grep.1"
+                    "/doc/man/man1/mtx-interface.1"
+                    "/doc/man/man1/mtx-metapost.1"
+                    "/doc/man/man1/mtx-modules.1"
+                    "/doc/man/man1/mtx-package.1"
+                    "/doc/man/man1/mtx-pdf.1"
+                    "/doc/man/man1/mtx-plain.1"
+                    "/doc/man/man1/mtx-profile.1"
+                    "/doc/man/man1/mtx-rsync.1"
+                    "/doc/man/man1/mtx-scite.1"
+                    "/doc/man/man1/mtx-server.1"
+                    "/doc/man/man1/mtx-texworks.1"
+                    "/doc/man/man1/mtx-timing.1"
+                    "/doc/man/man1/mtx-tools.1"
+                    "/doc/man/man1/mtx-unicode.1"
+                    "/doc/man/man1/mtx-unzip.1"
+                    "/doc/man/man1/mtx-update.1"
+                    "/doc/man/man1/mtx-watch.1"
+                    "/doc/man/man1/mtx-youless.1"
+
+                    
+                    "/bibtex/bst/context/"
+                    "/context/"
+
+                    "/fonts/afm/hoekwater/context/contnav.afm"
+                    "/fonts/cid/fontforge/Adobe-CNS1-4.cidmap"
+                    "/fonts/cid/fontforge/Adobe-GB1-4.cidmap"
+                    "/fonts/cid/fontforge/Adobe-Identity-0.cidmap"
+                    "/fonts/cid/fontforge/Adobe-Japan1-5.cidmap"
+                    "/fonts/cid/fontforge/Adobe-Japan1-6.cidmap"
+                    "/fonts/cid/fontforge/Adobe-Japan2-0.cidmap"
+                    "/fonts/cid/fontforge/Adobe-Korea1-2.cidmap"
+                    "/fonts/enc/dvips/context/"
+                    "/fonts/map/dvips/context/"
+                    "/fonts/map/luatex/context/"
+                    "/fonts/map/pdftex/context/"
+                    "/fonts/misc/xetex/fontmapping/context/"
+                    "/fonts/tfm/hoekwater/context/"
+                    "/fonts/type1/hoekwater/context/"
+                    "/metapost/context/"
+                    "/scripts/context/"
+                    "/tex/context/base/"
+                    "/tex/context/bib/"
+                    "/tex/context/colors/"
+                    "/tex/context/fonts/"
+                    "/tex/context/interface/"
+                    "/tex/context/modules/"
+                    "/tex/context/patterns/"
+                    "/tex/context/sample/"
+                    "/tex/context/test/"
+                    "/tex/context/user/"
+                    "/tex/generic/context/"
+                    "/tex/latex/context/")
+              (base32
+               "1npaw9jy41iv9qiilbmcljvc28rjzyjkan6mfcxizv2sbirymwp1")
+              #:trivial? #t))
+    ;; TODO: add these missing packages:
+    ;; xetex, luatex, lm-math, manfnt-font, and mptopdf
+    (propagated-inputs
+     `(("texlive-amsfonts" ,texlive-amsfonts)
+       ("texlive-lm" ,texlive-lm)
+       ("texlive-pdftex" ,texlive-pdftex)
+       ("texlive-metapost" ,texlive-metapost)
+       ("texlive-fonts-stmaryrd" ,texlive-fonts-stmaryrd)
+       ("texlive-mflogo-font" ,texlive-mflogo-font)))
     (home-page "https://www.ctan.org/pkg/context")
     (synopsis "Full featured, parameter driven macro package for TeX")
     (description "A full featured, parameter driven macro package, which fully
 supports advanced interactive documents.  See the ConTeXt garden for a wealth
 of support information.")
     (license license:gpl2+)))
+
+(define-public texlive-context-base
+  (deprecated-package "texlive-context-base" texlive-context))
 
 (define-public texlive-beamer
   (package
@@ -7385,7 +7474,7 @@ the file to which it applies.")
                (delete-file (string-append target "/pdfx.sty"))
                #t))))))
     (propagated-inputs
-     `(("texlive-generic-pdftex" ,texlive-generic-pdftex)))
+     `(("texlive-pdftex" ,texlive-pdftex)))
     (native-inputs
      `(("texlive-tex-pdfx"
         ,(origin

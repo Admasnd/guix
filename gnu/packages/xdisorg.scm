@@ -1027,7 +1027,7 @@ shows it again when the mouse cursor moves or a mouse button is pressed.")
 (define-public xlockmore
   (package
     (name "xlockmore")
-    (version "5.66")
+    (version "5.67")
     (source (origin
              (method url-fetch)
              (uri (list (string-append "http://sillycycle.com/xlock/"
@@ -1038,7 +1038,7 @@ shows it again when the mouse cursor moves or a mouse button is pressed.")
                                        "xlockmore-" version ".tar.xz")))
              (sha256
               (base32
-               "0wdb7gpyjw3sigmhiplgg1bqxz6wipr0c3n9492x2a18cv1saxjr"))))
+               "0k13gxgnk4i041g1fzixfwlf3l5hrvvkhfvxf27szx0d1qbpwq58"))))
     (build-system gnu-build-system)
     (arguments
      '(#:configure-flags (list (string-append "--enable-appdefaultdir="
@@ -2452,7 +2452,7 @@ can optionally use some appearance settings from XSettings, tint2 and GTK.")
 (define-public xwallpaper
   (package
     (name "xwallpaper")
-    (version "0.6.6")
+    (version "0.7.3")
     (source
      (origin
        (method git-fetch)
@@ -2461,7 +2461,7 @@ can optionally use some appearance settings from XSettings, tint2 and GTK.")
              (commit (string-append "v" version))))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "10klm81rs3k3l2i7whpvcsg95x51ja11l86fmwbrvg3kq705p2sr"))))
+        (base32 "1rsv42cl0s149sbpdxz9yqqjip3si95jv3dglwzrcm7pjfg7519v"))))
     (build-system gnu-build-system)
     (native-inputs
      `(("autoconf" ,autoconf)
@@ -3015,3 +3015,31 @@ System.  This includes such features as MouseKeys, AccessX, StickyKeys,
 BounceKeys, and SlowKeys.  It includes a graphical program to help with
 MouseKeys-acceleration management.")
     (license license:bsd-3)))
+
+(define-public wlsunset
+  (package
+    (name "wlsunset")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://git.sr.ht/~kennylevinsen/wlsunset/")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0hhsddh3rs066rbsjksr8kcwg8lvglbvs67dq0r5wx5c1xcwb51w"))))
+    (build-system meson-build-system)
+    (inputs
+     `(("wayland" ,wayland)
+       ("wayland-protocols" ,wayland-protocols)))
+    (native-inputs
+     `(("pkg-config" ,pkg-config)))
+    (synopsis "Day/night gamma adjustments for Wayland compositors")
+    (home-page "https://sr.ht/~kennylevinsen/wlsunset/")
+    (description
+     "wlunset adjusts gamma based on day-night cycles on Wayland compositors
+that support @samp{wlr-gamma-control-unstable-v1}.  It is also known as a blue
+light filter or night light.")
+    (license license:expat)))

@@ -24,7 +24,7 @@
 ;;; Copyright © 2018 Clément Lassieur <clement@lassieur.org>
 ;;; Copyright © 2018 Theodoros Foradis <theodoros@foradis.org>
 ;;; Copyright © 2018, 2020, 2021 Marius Bakke <marius@gnu.org>
-;;; Copyright © 2018, 2020 Oleg Pykhalov <go.wigust@gmail.com>
+;;; Copyright © 2018, 2020, 2021 Oleg Pykhalov <go.wigust@gmail.com>
 ;;; Copyright © 2018 Pierre Neidhardt <mail@ambrevar.xyz>
 ;;; Copyright © 2019, 2020, 2021 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2019 Vasile Dumitrascu <va511e@yahoo.com>
@@ -44,6 +44,7 @@
 ;;; Copyright © 2021 Hartmut Goebel <h.goebel@crazy-compilers.com>
 ;;; Copyright © 2021 Justin Veilleux <terramorpha@cock.li>
 ;;; Copyright © 2021 Vinicius Monego <monego@posteo.net>
+;;; Copyright © 2021 Milkey Mouse <milkeymouse@meme.institute>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -383,6 +384,30 @@ supported, including rtmp://, rtmpt://, rtmpe://, rtmpte://, and rtmps://.")
         license:lgpl2.1+
         ;; Others.
         license:gpl2+)))))
+
+(define-public slurm-monitor
+  (package
+    (name "slurm-monitor")
+    (version "0.4.3")
+    (source
+     (origin
+       (method git-fetch)
+       (uri
+        (git-reference
+         (url "https://github.com/mattthias/slurm")
+         (commit (string-append "upstream/" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "1n6pgrcs8gwrcq5fch1q3yk3jipjwrf21s9a13fbjrl903g5zzv9"))))
+    (build-system cmake-build-system)
+    (arguments `(#:tests? #f)) ;no tests
+    (inputs `(("ncurses" ,ncurses)))
+    (synopsis "Network load monitor")
+    (description
+     "Slurm is a network load monitor.  It shows real-time traffic statistics
+from any network device in any of three ASCII graph formats.")
+    (home-page "https://github.com/mattthias/slurm")
+    (license license:gpl2)))
 
 (define-public srt
   (package
@@ -3511,6 +3536,39 @@ A very simple IM client working over the DHT.
 protocol daemons for BGP, IS-IS, LDP, OSPF, PIM, and RIP. ")
     (license license:gpl2+)))
 
+(define-public bird
+  (package
+    (name "bird")
+    (version "2.0.8")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "ftp://bird.network.cz/pub/bird/bird-"
+                                  version ".tar.gz"))
+              (sha256
+               (base32
+                "1xp7f0im1v8pqqx3xqyfkd1nsxk8vnbqgrdrwnwhg8r5xs1xxlhr"))))
+    (inputs
+     `(("libssh" ,libssh)
+       ("readline" ,readline)))
+    (native-inputs
+     `(("bison" ,bison)
+       ("flex" ,flex)))
+    (arguments
+     `(#:configure-flags '("--localstatedir=/var" "--enable-ipv6")
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'configure 'dont-create-sysconfdir
+           (lambda* (#:key outputs #:allow-other-keys)
+             (substitute* "Makefile.in"
+               ((" \\$\\(DESTDIR)/\\$\\(runstatedir)") "")))))))
+    (build-system gnu-build-system)
+    (home-page "http://bird.network.cz")
+    (synopsis "Internet Routing Daemon")
+    (description "BIRD is an Internet routing daemon with full support for all
+the major routing protocols.  It allows redistribution between protocols with a
+powerful route filtering syntax and an easy-to-use configuration interface.")
+    (license license:gpl2+)))
+
 (define-public iwd
   (package
     (name "iwd")
@@ -3592,14 +3650,14 @@ written (and providing API) in C.  Current implementation covers YANG 1.0 (RFC
 (define-public batctl
   (package
    (name "batctl")
-   (version "2020.4")
+   (version "2021.3")
    (source
     (origin
      (method url-fetch)
      (uri (string-append "https://downloads.open-mesh.org/batman/releases/batman-adv-"
                          version "/batctl-" version ".tar.gz"))
      (sha256
-      (base32 "05rrpfbpdhxn5zgdps849qls2ifis6a94cjryb60d4y1nc2n0d7w"))))
+      (base32 "087w8xxxpqxs5cz4aj4l9wzbh0ga8163nh7qy44ld2lgqbplnbzj"))))
    (inputs
     `(("libnl" ,libnl)))
    (native-inputs

@@ -19,6 +19,7 @@
 ;;; Copyright © 2021 Benoit Joly <benoit@benoitj.ca>
 ;;; Copyright © 2021 Alexander Krotov <krotov@iitp.ru>
 ;;; Copyright © 2020 Hartmut Goebel <h.goebel@crazy-compilers.com>
+;;; Copyright © 2021 Christopher Howard <christopher@librehacker.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -575,18 +576,16 @@ driven and does not detract you from your daily work.")
 (define-public nyxt
   (package
     (name "nyxt")
-    (version "2.1.1")
+    (version "2.2.0")
     (source
      (origin
        (method git-fetch)
        (uri (git-reference
-             ;; TODO: Mirror seems to hang, let's fallback to GitHub for now.
-             ;; (url "https://source.atlas.engineer/public/nyxt")
              (url "https://github.com/atlas-engineer/nyxt")
              (commit version)))
        (sha256
         (base32
-         "0kzm05swhyb197cjfd3iglf60b997sx7v95yxzyq483jxqbcxm0r"))
+         "0l8x32fsvk2gbymcda1yc0ggnsymjazqd58vmi05ifiiv7jwxyjw"))
        (file-name (git-file-name "nyxt" version))))
     (build-system gnu-build-system)
     (arguments
@@ -635,31 +634,36 @@ driven and does not detract you from your daily work.")
     (inputs
      `(("alexandria" ,sbcl-alexandria)
        ("bordeaux-threads" ,sbcl-bordeaux-threads)
+       ("cl-base64" ,sbcl-cl-base64)
        ("cl-calispel" ,sbcl-calispel)
        ("cl-containers" ,sbcl-cl-containers)
        ("cl-css" ,sbcl-cl-css)
        ("cl-custom-hash-table" ,sbcl-custom-hash-table)
        ("cl-html-diff" ,sbcl-cl-html-diff)
        ("cl-json" ,sbcl-cl-json)
-       ("cl-markup" ,sbcl-cl-markup)
        ("cl-ppcre" ,sbcl-cl-ppcre)
        ("cl-prevalence" ,sbcl-cl-prevalence)
+       ("cl-qrencode" ,sbcl-cl-qrencode)
        ("closer-mop" ,sbcl-closer-mop)
        ("cluffer" ,sbcl-cluffer)
        ("dexador" ,sbcl-dexador)
        ("enchant" ,sbcl-enchant)
+       ("flexi-streams" ,cl-flexi-streams)
        ("fset" ,sbcl-fset)
        ("hu.dwim.defclass-star" ,sbcl-hu.dwim.defclass-star)
        ("iolib" ,sbcl-iolib)
        ("local-time" ,sbcl-local-time)
        ("log4cl" ,sbcl-log4cl)
+       ("lparallel" ,sbcl-lparallel)
        ("mk-string-metrics" ,sbcl-mk-string-metrics)
        ("moptilities" ,sbcl-moptilities)
        ("named-readtables" ,sbcl-named-readtables)
        ("parenscript" ,sbcl-parenscript)
        ("plump" ,sbcl-plump)
+       ("clss" ,sbcl-clss)
        ("quri" ,sbcl-quri)
        ("serapeum" ,sbcl-serapeum)
+       ("spinneret" ,sbcl-spinneret)
        ("str" ,sbcl-cl-str)
        ("swank" ,sbcl-slime-swank)
        ("trivia" ,sbcl-trivia)
@@ -881,14 +885,14 @@ interface.")
 (define-public telescope
   (package
     (name "telescope")
-    (version "0.5.1")
+    (version "0.5.2")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://github.com/omar-polo/telescope/releases/download/"
                            version "/telescope-" version ".tar.gz"))
        (sha256
-        (base32 "1fgv7gg2lwrjcihq6mkraqm10a6a7h430ikrjpcwfcpv1gvj8ckz"))))
+        (base32 "0phvwhxvm63y68cyvzw5dk60yjzfv6bpxf5c4bl08daj3ia48fbk"))))
     (build-system gnu-build-system)
     (arguments
      `(#:tests? #f))                    ;no tests
@@ -903,3 +907,31 @@ interface.")
     (synopsis "Gemini client with a terminal interface")
     (description "Telescope is a w3m-like browser for Gemini.")
     (license license:x11)))
+
+(define-public av-98
+  (package
+    (name "av-98")
+    (version "1.0.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "AV-98" version))
+       (sha256
+        (base32
+         "02fjnc2rvm010gb3i07p8r4xlhrmnv1wca1qymfjcymr7vm68h0i"))))
+    (build-system python-build-system)
+    (home-page "https://tildegit.org/solderpunk/AV-98/")
+    (synopsis "Command line Gemini client")
+    (description "AV-98 is an experimental client for the Gemini protocol.
+Features include
+@itemize
+@item TOFU or CA server certificate validation;
+@item Extensive client certificate support if an openssl binary is available;
+@item Ability to specify external handler programs for different MIME types;
+@item Gopher proxy support;
+@item Advanced navigation tools like tour and mark (as per VF-1);
+@item Bookmarks;
+@item IPv6 support;
+@item Support for any character encoding recognised by Python.
+@end itemize")
+    (license license:bsd-2)))

@@ -108,6 +108,8 @@
 ;;; Copyright © 2021 Franck Pérignon <franck.perignon@univ-grenoble-alpes.fr>
 ;;; Copyright © 2021 Petr Hodina <phodina@protonmail.com>
 ;;; Copyright © 2021 Simon Streit <simon@netpanic.org>
+;;; Copyright © 2021 Daniel Meißner <daniel.meissner-i4k@ruhr-uni-bochum.de>
+;;; Copyright © 2021 Pradana Aumars <paumars@courrier.dev>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -5389,7 +5391,7 @@ readable format.")
        ("texlive" ,(texlive-union (list texlive-fonts-cm-super
                                         texlive-fonts-ec
                                         texlive-generic-ifxetex
-                                        texlive-generic-pdftex
+                                        texlive-pdftex
                                         texlive-amsfonts/patched
                                         texlive-latex-capt-of
                                         texlive-latex-cmap
@@ -5932,7 +5934,7 @@ toolkits.")
                                         texlive-latex-type1cm
                                         texlive-latex-ucs
 
-                                        texlive-generic-pdftex
+                                        texlive-pdftex
 
                                         texlive-fonts-ec
                                         texlive-fonts-adobe-times
@@ -7101,13 +7103,13 @@ PNG, PostScript, PDF, and SVG file output.")
 (define-public python-decorator
   (package
     (name "python-decorator")
-    (version "4.3.0")
+    (version "5.0.9")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "decorator" version))
        (sha256
-        (base32 "0308djallnh00v112y5b7nadl657ysmkp6vc8xn51d6yzc9zm7n3"))))
+        (base32 "1mcy64hllgm938v8k1x2a4g0q9swsnrfnsvhz59kr28a6ajgpv3j"))))
     (build-system python-build-system)
     (home-page "https://pypi.org/project/decorator/")
     (synopsis "Python module to simplify usage of decorators")
@@ -8267,7 +8269,7 @@ computing.")
        ("texlive" ,(texlive-union (list texlive-amsfonts/patched
                                         texlive-fonts-ec
                                         texlive-generic-ifxetex
-                                        texlive-generic-pdftex
+                                        texlive-pdftex
                                         texlive-latex-capt-of
                                         texlive-latex-cmap
                                         texlive-latex-environ
@@ -10369,6 +10371,37 @@ Unicode-aware.  It is not intended as an end-user tool.")
 
 (define-public python2-xlrd
   (package-with-python2 python-xlrd))
+
+(define-public python-xlwt
+  (package
+    (name "python-xlwt")
+    (version "1.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "xlwt" version))
+       (sha256
+        (base32 "123c2pdamshkq75wwvck8fq0cjq1843xd3x9qaiz2a4vg9qi56f5"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (setenv "PYTHONPATH"
+                       (string-append (getcwd) "/build/lib:"
+                                      (getenv "PYTHONPATH")))
+               (invoke "nosetests" "-v")))))))
+    (native-inputs
+     `(("nose" ,python-nose)))
+    (home-page "http://www.python-excel.org/")
+    (synopsis "Library for creating spreadsheet Excel files")
+    (description "@code{xlwt} is a library for writing data and formatting
+information to older Excel files (i.e. .xls).  The package itself is pure
+Python with no dependencies on modules or packages outside the standard Python
+distribution.  It is not intended as an end-user tool.")
+    (license license:bsd-3)))
 
 (define-public python-immutables
   (package
@@ -16002,13 +16035,13 @@ Python to manipulate OpenDocument 1.2 files.")
 (define-public python-natsort
   (package
     (name "python-natsort")
-    (version "7.0.1")
+    (version "7.1.1")
     (source (origin
               (method url-fetch)
               (uri (pypi-uri "natsort" version))
               (sha256
                (base32
-                "1ksqfai72dbcfbwx43pxl658j59mx2rvqypjy1fk0ax2qd6lccx6"))))
+                "00y49bfsi7rrsd1s42gc2w95a6arl9ipdsx2493hr0v54fj07ih0"))))
     (build-system python-build-system)
     (arguments
      `(#:modules ((guix build utils)
@@ -16018,9 +16051,6 @@ Python to manipulate OpenDocument 1.2 files.")
                   (ice-9 ftw))
        #:phases
        (modify-phases %standard-phases
-         (add-before 'check 'set-cachedir
-           ;; Tests require write access to $HOME by default
-           (lambda _ (setenv "PYTHON_EGG_CACHE" "/tmp") #t))
          (replace 'check
            (lambda _
              (let ((cwd (getcwd)))
@@ -16050,23 +16080,7 @@ on a list such as @code{[@code{a20}, @code{a9}, @code{a1}, @code{a4},
 identifies numbers and sorts them separately from strings.  It can also sort
 version numbers, real numbers, mixed types and more, and comes with a shell
 command @command{natsort} that exposes this functionality in the command line.")
-    (license license:expat)
-    (properties `((python2-variant . ,(delay python2-natsort))))))
-
-;; Natsort 6.x are the last versions with support for Python 2.
-(define-public python2-natsort
-  (let ((base (package-with-python2 (strip-python2-variant python-natsort))))
-    (package (inherit base)
-             (version "6.2.1")
-             (source (origin
-                       (method url-fetch)
-                       (uri (pypi-uri "natsort" version))
-                       (sha256
-                        (base32
-                         "1mc9hbh6fv76xyz13frm7dgi05cf74f9j5wvcyjiy5234gylz565"))))
-             (native-inputs
-              `(("python2-pathlib" ,python2-pathlib)
-                ,@(package-native-inputs base))))))
+    (license license:expat)))
 
 (define-public glances
   (package
@@ -17967,14 +17981,14 @@ information.")
 (define-public python-relatorio
   (package
     (name "python-relatorio")
-    (version "0.8.0")
+    (version "0.10.0")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "relatorio" version))
        (sha256
         (base32
-         "1na6hlhz1awi1hbjg1gyclq0khz42iz90wvdjw7mmj655788bpxx"))))
+         "09nhrz80dfm60nssbvjgz4czzy4yzfa8gxczcdlzbgcnnvm914vb"))))
     (build-system python-build-system)
     (propagated-inputs
      `(("python-lxml" ,python-lxml)
@@ -22436,6 +22450,28 @@ processes may share the same data.")
      "@code{croniter} provides iteration for datetime object with cron-like
 format.")
     (license license:expat)))
+
+(define-public python-crontab
+  (package
+    (name "python-crontab")
+    (version "2.5.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri name version))
+       (sha256
+        (base32 "0cccrqc10r8781ba81x8r2frs3pl2m4hkm599k5358ak0xr7xgjb"))))
+    (build-system python-build-system)
+    (arguments
+     ;; Comptability tests fail so they are disabled.
+     `(#:tests? #f))
+    (inputs
+     `(("python-dateutil" ,python-dateutil)))
+    (home-page "https://gitlab.com/doctormo/python-crontab/")
+    (synopsis "Module for reading and writing crontab files")
+    (description "This Python module can read, write crontab files, and
+access the system cron automatically and simply using a direct API.")
+    (license license:lgpl3+)))
 
 (define-public python-pylzma
   (package
@@ -27148,39 +27184,39 @@ YYYY-MM-DD at the beginning of the file or directory name.")
                     "py_modules=['onlykey_agent']"))
                  #t))))
     (build-system python-build-system)
-    (arguments
-     '(#:phases
-       (modify-phases %standard-phases
-         ;; prevents runtime error where shell wrapper for onlykey_agent.py is loaded as module
-         (replace 'wrap
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (define (list-of-files dir)
-               (find-files dir (lambda (file stat)
-                                 (and (eq? 'regular (stat:type stat))
-                                      (not (wrapper? file))
-                                      (not ((file-name-predicate "onlykey_agent.py") 
-                                            file 
-                                            stat))))))
+    ;; (arguments
+    ;;  '(#:phases
+    ;;    (modify-phases %standard-phases
+    ;;      ;; prevents runtime error where shell wrapper for onlykey_agent.py is loaded as module
+    ;;      (replace 'wrap
+    ;;        (lambda* (#:key inputs outputs #:allow-other-keys)
+    ;;          (define (list-of-files dir)
+    ;;            (find-files dir (lambda (file stat)
+    ;;                              (and (eq? 'regular (stat:type stat))
+    ;;                                   (not (wrapper? file))
+    ;;                                   (not ((file-name-predicate "onlykey_agent.py") 
+    ;;                                         file 
+    ;;                                         stat))))))
 
-             (define bindirs
-               (let ((out (assoc-ref outputs "out"))) 
-                 (list (string-append out "/bin")
-                       (string-append out "/sbin"))))
+    ;;          (define bindirs
+    ;;            (let ((out (assoc-ref outputs "out"))) 
+    ;;              (list (string-append out "/bin")
+    ;;                    (string-append out "/sbin"))))
 
-             (let* ((out  (assoc-ref outputs "out"))
-                    (python (assoc-ref inputs "python"))
-                    (var `("PYTHONPATH" prefix
-                           ,(cons (string-append out "/lib/python"
-                                                 (python-version python)
-                                                 "/site-packages")
-                                  (search-path-as-string->list
-                                   (or (getenv "PYTHONPATH") ""))))))
-               (for-each (lambda (dir)
-                           (let ((files (list-of-files dir)))
-                             (for-each (lambda (file) (wrap-program file var)) 
-                                       files)))
-                         bindirs)
-               #t))))))
+    ;;          (let* ((out  (assoc-ref outputs "out"))
+    ;;                 (python (assoc-ref inputs "python"))
+    ;;                 (var `("PYTHONPATH" prefix
+    ;;                        ,(cons (string-append out "/lib/python"
+    ;;                                              (python-version python)
+    ;;                                              "/site-packages")
+    ;;                               (search-path-as-string->list
+    ;;                                (or (getenv "PYTHONPATH") ""))))))
+    ;;            (for-each (lambda (dir)
+    ;;                        (let ((files (list-of-files dir)))
+    ;;                          (for-each (lambda (file) (wrap-program file var)) 
+    ;;                                    files)))
+    ;;                      bindirs)
+    ;;            #t))))))
     (propagated-inputs
       `(("python-lib-agent" ,python-lib-agent)
         ("python-onlykey" ,python-onlykey)))
@@ -27191,3 +27227,189 @@ YYYY-MM-DD at the beginning of the file or directory name.")
     (description
       "Using OnlyKey as hardware SSH/GPG agent")
     (license license:lgpl3)))
+
+(define-public python-braintree
+  (package
+    (name "python-braintree")
+    (version "4.12.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "braintree" version))
+       (sha256
+        (base32 "19kli85q18p80nsn8fm4ql6axpr7bllfqg5chv2ywhr8zr8bssll"))))
+    (build-system python-build-system)
+    (propagated-inputs
+     `(("python-requests" ,python-requests)))
+    (home-page
+     "https://developers.braintreepayments.com/python/sdk/server/overview")
+    (synopsis "Braintree Python Library")
+    (description "The Braintree Python SDK provides integration access to the
+Braintree Gateway.  Braintree is a US-based payments service provider.")
+    (license license:expat)))
+
+(define-public python-markuppy
+  (package
+    (name "python-markuppy")
+    (version "1.14")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "MarkupPy" version))
+       (sha256
+        (base32 "0pqdmpxbr8iq22b4css2gz5z6s01ddpzyj25x27kgbs2lp0f5phs"))))
+    (build-system python-build-system)
+    (home-page "https://github.com/tylerbakke/MarkupPy")
+    (synopsis "A pythonic HTML/XML generator")
+    (description "This Python module attempts to make it easier to generate
+HTML/XML from a Python program in an intuitive, lightweight, customizable and
+pythonic way.")
+    (license license:expat)))
+
+(define-public python-tablib
+  (package
+    (name "python-tablib")
+    (version "3.0.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "tablib" version))
+       (sha256
+       (base32 "03f1z6jq6rf67gwhbm9ma4rydm8h447a5nh5lcs5l8jg8l4aqg7q"))))
+    (build-system python-build-system)
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (setenv "PYTHONPATH"
+                       (string-append (getcwd) "/build/lib:"
+                                      (getenv "PYTHONPATH")))
+               (invoke "pytest")))))))
+    (native-inputs
+     `(("python-pandas" ,python-pandas)  ;; required for test-suite
+       ("python-pytest" ,python-pytest)
+       ("python-pytest-cov" ,python-pytest-cov)
+       ("python-setuptools-scm" ,python-setuptools-scm)))
+    (propagated-inputs
+     `(("python-markuppy" ,python-markuppy)
+       ("python-odfpy" ,python-odfpy)
+       ("python-openpyxl" ,python-openpyxl)
+       ("python-pyyaml" ,python-pyyaml)
+       ("python-tabulate" ,python-tabulate)
+       ("python-xlrd" ,python-xlrd)
+       ("python-xlwt" ,python-xlwt)))
+    (home-page "https://tablib.readthedocs.io")
+    (synopsis "Format agnostic tabular data library")
+    (description "@code{tablib} is a format-agnostic tabular dataset library,
+written in Python.  Supported output formats are Excel (Sets + Books),
+JSON (Sets + Books), YAML (Sets + Books), HTML (Sets), Jira (Sets),
+TSV (Sets), ODS (Sets), CSV (Sets), and DBF (Sets).
+
+@code{tablib} also supports Pandas DataFrames (Sets).  Anyhow, since pandas is
+quite huge, this Guix package doesn't depend on pandas.  In case, just also
+install @code{python-pandas}.")
+    (license license:expat)))
+
+(define-public python-csb43
+  (package
+    (name "python-csb43")
+    (version "0.9.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "csb43" version))
+       (sha256
+        (base32 "0r0csl9npncnkfafg3rg6xr38d1qr0sxvq7wn7mg9bq41hvvh1si"))))
+    (build-system python-build-system)
+    (native-inputs
+     `(("python-lxml" ,python-lxml)))
+    (propagated-inputs
+     `(("python-pycountry" ,python-pycountry)
+       ("python-pyyaml" ,python-pyyaml)
+       ("python-tablib" ,python-tablib)))
+    (home-page "https://bitbucket.org/wmj/csb43")
+    (synopsis "Tools for converting from the Spanish banks' format CSB norm
+43 (CSB43)")
+    (description "This package provides tools to convert files in the format
+used by multiple Spanish banks (standard 43 of the Spanish Banking Council
+[CSB43] / Spanish Banking Association [AEB43]) to other formats.
+
+Supported output formats are: OFX, HomeBank CSV, HTML, JSON, ODS (OpenDocument
+spreadsheet), CSV, TSV, XLS, XLSX (Microsoft Excel spreadsheet), and YAML.")
+    (license license:lgpl3)))
+
+(define-public python-febelfin-coda
+  (package
+    (name "python-febelfin-coda")
+    (version "0.1.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "febelfin-coda" version))
+       (sha256
+        (base32 "10nf4hdwldqgdmh4g613vx55sbsw1x1yzpvs3crwlggbp75fjjfi"))))
+    (build-system python-build-system)
+    (home-page "https://coda.b2ck.com/")
+    (synopsis "A module to parse Belgian CODA files")
+    (description "This package provides a module to parse Coded statement of
+account (CODA) files as defined be the Belgian Febelfin bank standard.")
+    (license license:bsd-3)))
+
+(define-public python-ofxparse
+  (package
+    (name "python-ofxparse")
+    (version "0.21")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "ofxparse" version))
+       (sha256
+        (base32 "19y4sp5l9jqiqzzlbqdfiab42qx7d84n4xm4s7jfq397666vcyh5"))))
+    (build-system python-build-system)
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (invoke "nosetests" "-v")))))))
+    (native-inputs
+     `(("python-nose" ,python-nose)))
+    (propagated-inputs
+     `(("python-beautifulsoup4" ,python-beautifulsoup4)
+       ("python-lxml" ,python-lxml)
+       ("python-six" ,python-six)))
+    (home-page "http://sites.google.com/site/ofxparse")
+    (synopsis "Tools for working with the OFX (Open Financial Exchange) file
+format")
+    (description "@code{ofxparse} is a parser for Open Financial
+Exchange (.ofx) format files.  OFX files are available from almost any online
+banking site, so they work well if you want to pull together your finances
+from multiple sources.  Online trading accounts also often provide account
+statements in OFX files.")
+    (license license:expat)))
+
+(define-public python-stripe
+  (package
+    (name "python-stripe")
+    (version "2.60.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "stripe" version))
+       (sha256
+        (base32 "0258lzh4qikhinfggnlfh5aklcvg7lrvl8giqrh0yf0l61wvfrl9"))))
+    (build-system python-build-system)
+    (arguments
+     '(#:tests? #f))  ;; tests require network
+    (propagated-inputs
+     `(("python-requests" ,python-requests)))
+    (home-page "https://github.com/stripe/stripe-python")
+    (synopsis "Python bindings for the Stripe financial services' API")
+    (description "This package provides access to the Stripe financial
+services' API.  It includes a pre-defined set of classes for API resources
+that initialize themselves dynamically from API responses which makes it
+compatible with a wide range of versions of the Stripe API.")
+    (license license:expat)))

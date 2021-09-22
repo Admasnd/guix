@@ -5049,7 +5049,7 @@ as part of the same ocaml-migrate-parsetree driver.")
 (define-public ocaml-ppxlib
   (package
     (name "ocaml-ppxlib")
-    (version "0.22.1")
+    (version "0.23.0")
     (home-page "https://github.com/ocaml-ppx/ppxlib")
     (source
      (origin
@@ -5060,7 +5060,7 @@ as part of the same ocaml-migrate-parsetree driver.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0cpfg634if1py1b2rljk3cagq9gj68dl2gk1kdg76f9rapvl2i4g"))))
+         "0jg5v4pssbl66hn5davpin1i57a0r3r54l96vpz5y99xk5w70xi1"))))
     (build-system dune-build-system)
     (propagated-inputs
      `(("ocaml-base" ,ocaml-base)
@@ -5340,6 +5340,10 @@ definitions.")
        (uri (git-reference
              (url "https://github.com/janestreet/ppx_variants_conv")
              (commit (string-append "v" version))))
+       (patches
+        (search-patches
+         ;; Fix build when building with ocaml-ppxlib@0.23.0.
+         "ocaml-ppx-variants-ppxlib-api-change.patch"))
        (file-name (git-file-name name version))
        (sha256
         (base32
@@ -5786,7 +5790,7 @@ else expression.")
 (define-public ocaml-ppx-optcomp
   (package
     (name "ocaml-ppx-optcomp")
-    (version "0.14.1")
+    (version "0.14.3")
     (home-page "https://github.com/janestreet/ppx_optcomp")
     (source
      (origin
@@ -5797,7 +5801,7 @@ else expression.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0j5smqa0hig1yn8wfrb4mv0y59kkwsalmqkm5asbd7kcc6589ap4"))))
+         "1iflgfzs23asw3k6098v84al5zqx59rx2qjw0mhvk56avlx71pkw"))))
     (build-system dune-build-system)
     (propagated-inputs
      `(("ocaml-base" ,ocaml-base)
@@ -6503,6 +6507,9 @@ stream, and convert everything to UTF-8.")
        (sha256
         (base32
          "0aif4abvfmi9xc1pvw5n5rbm6rzkkpsxyvdn0lanr33rjpvkwdlm"))))
+    (native-inputs
+     `(("ocaml-ounit" ,ocaml-ounit)
+       ("pkg-config" ,pkg-config)))
     (properties '())))
 
 (define-public ocaml-tyxml
@@ -7142,7 +7149,7 @@ get an precise reference of when the executable was built.")))
 (define-public ocamlformat
   (package
     (name "ocamlformat")
-    (version "0.18.0")
+    (version "0.19.0")
     (source
       (origin
         (method git-fetch)
@@ -7152,7 +7159,7 @@ get an precise reference of when the executable was built.")))
         (file-name (git-file-name name version))
         (sha256
           (base32
-            "0n6363km8xr81pvyk453n6h2mb0256c5yxw3p1li4dn83f3lwxr1"))))
+            "0dp4pkznz9yvqx9gxwbid1z2b8ajkr8i27zay9ghx69624hz3i4z"))))
     (build-system dune-build-system)
     (arguments
      '(#:package "ocamlformat"
@@ -7170,6 +7177,7 @@ get an precise reference of when the executable was built.")))
         ("ocaml-odoc" ,ocaml-odoc)
         ("ocaml-ppxlib" ,ocaml-ppxlib)
         ("ocaml-re" ,ocaml-re)
+        ("ocaml-odoc-parser" ,ocaml-odoc-parser)
         ("ocaml-stdio" ,ocaml-stdio)
         ("ocaml-uuseg" ,ocaml-uuseg)
         ("ocaml-uutf" ,ocaml-uutf)))

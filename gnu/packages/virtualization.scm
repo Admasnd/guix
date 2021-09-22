@@ -372,6 +372,7 @@ server and embedded PowerPC, and S390 guests.")
   (package
     (inherit qemu)
     (name "qemu-minimal")
+    (outputs '("out" "doc"))
     (synopsis
      "Machine emulator and virtualizer (without GUI) for the host architecture")
     (arguments
@@ -407,11 +408,16 @@ server and embedded PowerPC, and S390 guests.")
                    "--target-list=riscv32-softmmu,riscv64-softmmu")
                   (else       ; An empty list actually builds all the targets.
                    '()))))
-          `(cons ,target-list-arg ,configure-flags)))))
+          `(cons ,target-list-arg ,configure-flags)))
+       ((#:phases phases)
+        `(modify-phases ,phases
+           (delete 'configure-user-static)
+           (delete 'build-user-static)
+           (delete 'install-user-static)))))
 
     ;; Remove dependencies on optional libraries, notably GUI libraries.
     (native-inputs (fold alist-delete (package-native-inputs qemu)
-                         '("gettext")))
+                         '("gettext" "glib:static" "pcre:static" "zlib:static")))
     (inputs (fold alist-delete (package-inputs qemu)
                   '("libusb" "mesa" "sdl2" "spice" "virglrenderer" "gtk+"
                     "usbredir" "libdrm" "libepoxy" "pulseaudio" "vde2"
@@ -1008,7 +1014,8 @@ all common programming languages.  Vala bindings are also provided.")
                 "0qz4l7mlhq7hx53q606qgvkyzyr01glsw290v8ppzvxn1fydlrci"))))
     (build-system gnu-build-system)
     (native-inputs
-     `(("pkg-config" ,pkg-config)))
+     `(("pkg-config" ,pkg-config)
+       ("docbook2x" ,docbook2x)))
     (inputs
      `(("gnutls" ,gnutls)
        ("libcap" ,libcap)
@@ -1810,14 +1817,14 @@ by default and can be made read-only.")
 (define-public bochs
   (package
     (name "bochs")
-    (version "2.6.11")
+    (version "2.7")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://sourceforge.net/projects/bochs/files/bochs/"
                            version "/bochs-" version ".tar.gz"))
        (sha256
-        (base32 "0ql8q6y1k356li1g9gbvl21448mlxphxxi6kjb2b3pxvzd0pp2b3"))))
+        (base32 "0ymiwnfqg5npq2dk9ngidbbfn3qw8z6i491finhcaan7zldsn450"))))
     (build-system gnu-build-system)
     (arguments
      `(#:tests? #f))                    ; no tests exist

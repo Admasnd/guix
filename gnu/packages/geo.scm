@@ -1407,7 +1407,7 @@ to the OSM opening hours specification.")
 (define-public josm
   (package
     (name "josm")
-    (version "18118")
+    (version "18193")
     (source (origin
               (method svn-fetch)
               (uri (svn-reference
@@ -1416,7 +1416,7 @@ to the OSM opening hours specification.")
                      (recursive? #f)))
               (sha256
                (base32
-                "0109ddpxilm7f57n1kl4nf4lw0lh7jfmhfwf724nzlcz4k23mrs0"))
+                "162hdck29bkag1d97nisx8v7395pdw00bl7nf0p02hr30fc1fcrh"))
               (file-name (string-append name "-" version "-checkout"))
               (modules '((guix build utils)))
             (snippet
@@ -1524,14 +1524,17 @@ to the OSM opening hours specification.")
            (lambda* (#:key outputs #:allow-other-keys)
              (let ((out               (assoc-ref outputs "out"))
                    (share-directories '("applications" "icons" "man" "menu"
-                                        "metainfo" "mime" "pixmaps")))
+                                        "metainfo" "mime" "pixmaps"))
+                   (desktop "org.openstreetmap.josm.desktop"))
                (for-each (lambda (directory)
                            (copy-recursively (string-append
                                               "native/linux/tested/usr/share/"
                                               directory)
                                              (string-append
                                               out "/share/" directory)))
-                         share-directories))
+                         share-directories)
+               (substitute* (string-append out "/share/applications/" desktop)
+                 (("josm-MainApplication") "josm-gui-MainApplication")))
              #t))
          (add-after 'install 'install-bin
            (lambda* (#:key outputs inputs #:allow-other-keys)

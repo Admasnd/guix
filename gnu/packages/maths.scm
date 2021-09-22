@@ -5201,14 +5201,14 @@ supports compressed MAT files, as well as newer (version 7.3) MAT files.")
 (define-public vc
   (package
     (name "vc")
-    (version "1.4.1")
+    (version "1.4.2")
     (source
       (origin (method url-fetch)
               (uri (string-append "https://github.com/VcDevel/Vc/releases/"
                                   "download/" version "/Vc-" version ".tar.gz"))
               (sha256
                (base32
-                "17qili8bf8r78cng65yf4qmgna8kiqjqbgcqbric6v9j6nkhkrk8"))))
+                "0lirdqzcxys9walz04bllsphydynk7973aimd5k1h1qbwi8z3lsh"))))
     (build-system cmake-build-system)
     (arguments
      '(#:configure-flags
@@ -6390,7 +6390,7 @@ management via the GIMPS project's Primenet server.")
 (define-public nauty
   (package
     (name "nauty")
-    (version "2.7r2")
+    (version "2.7r3")
     (source
      (origin
        (method url-fetch)
@@ -6398,7 +6398,7 @@ management via the GIMPS project's Primenet server.")
              "https://pallini.di.uniroma1.it/"
              "nauty" (string-join (string-split version #\.) "") ".tar.gz"))
        (sha256
-        (base32 "0s57rq7kk3rrwgrjygpwjvq9bbwq4wjbpcvgbz191jhwv8bnrhb9"))))
+        (base32 "1hl81gpf3xjf809w04jczvilq1ixy9ch1qrax8a7lgx52svna1jg"))))
     (build-system gnu-build-system)
     (outputs '("out" "lib"))
     (arguments

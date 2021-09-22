@@ -4408,17 +4408,14 @@ and Reflect (RandR) extension.")
 (define-public xrdb
   (package
     (name "xrdb")
-    (version "1.2.0")
+    (version "1.2.1")
     (source
       (origin
         (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/app/xrdb-"
-               version
-               ".tar.bz2"))
+        (uri (string-append "mirror://xorg/individual/app/xrdb-"
+                            version ".tar.bz2"))
         (sha256
-          (base32
-            "0ik9gh6363c47pr0dp7q22nfs8vmavjg2v4bsr0604ppl77nafpj"))))
+          (base32 "1d78prd8sfszq2rwwlb32ksph4fymf988lp75aj8iysg44f06pag"))))
     (build-system gnu-build-system)
     (inputs
       `(("libxmu" ,libxmu)
@@ -4581,17 +4578,14 @@ extension.")
 (define-public xwd
   (package
     (name "xwd")
-    (version "1.0.7")
+    (version "1.0.8")
     (source
       (origin
         (method url-fetch)
-        (uri (string-append
-               "mirror://xorg/individual/app/xwd-"
-               version
-               ".tar.bz2"))
+        (uri (string-append "mirror://xorg/individual/app/xwd-"
+                            version ".tar.bz2"))
         (sha256
-          (base32
-            "1537i8q8pgf0sjklakzfvjwrq5b246qjywrx9ll8xfg0p6w1as6d"))))
+          (base32 "06q36fh55r62ms0igfxsanrn6gv8lh794q1bw9xzw51p2qs2papv"))))
     (build-system gnu-build-system)
     (inputs
       `(("libxt" ,libxt)
@@ -6697,7 +6691,7 @@ output.")
 (define-public console-setup
   (package
     (name "console-setup")
-    (version "1.203")
+    (version "1.205")
     (source
      (origin
        (method git-fetch)
@@ -6705,7 +6699,7 @@ output.")
              (url "https://salsa.debian.org/installer-team/console-setup.git")
              (commit version)))
        (sha256
-        (base32 "1bavb8h4j1za2h7mxr109imicjmh7fp4099lvzfgavhjr3l3vsab"))
+        (base32 "0sf560s14firyvzpgww79ydzc6p3jvjkbvsi8zsr5m3hr833w0ba"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (arguments

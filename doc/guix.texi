@@ -47,7 +47,7 @@ Copyright @copyright{} 2017, 2018 Carlo Zancanaro@*
 Copyright @copyright{} 2017 Thomas Danckaert@*
 Copyright @copyright{} 2017 humanitiesNerd@*
 Copyright @copyright{} 2017, 2021 Christine Lemmer-Webber@*
-Copyright @copyright{} 2017, 2018, 2019, 2020 Marius Bakke@*
+Copyright @copyright{} 2017, 2018, 2019, 2020, 2021 Marius Bakke@*
 Copyright @copyright{} 2017, 2019, 2020 Hartmut Goebel@*
 Copyright @copyright{} 2017, 2019, 2020, 2021 Maxim Cournoyer@*
 Copyright @copyright{} 2017, 2018, 2019, 2020, 2021 Tobias Geerinckx-Rice@*
@@ -742,6 +742,18 @@ with these commands:
      /etc/systemd/system/
 # systemctl enable --now gnu-store.mount guix-daemon
 @end example
+
+You may also want to arrange for @command{guix gc} to run periodically:
+
+@example
+# cp ~root/.config/guix/current/lib/systemd/system/guix-gc.service \
+     ~root/.config/guix/current/lib/systemd/system/guix-gc.timer \
+     /etc/systemd/system/
+# systemctl enable --now guix-gc.timer
+@end example
+
+You may want to edit @file{guix-gc.service} to adjust the command line
+options to fit your needs (@pxref{Invoking guix gc}).
 
 If your host distro uses the Upstart init system:
 
@@ -7010,9 +7022,10 @@ retrieve.
 The URL of the Git repository to clone.
 
 @item @code{commit}
-This string denotes either the commit to fetch (a hexadecimal string,
-either the full SHA1 commit or a ``short'' commit string; the latter is
-not recommended) or the tag to fetch.
+This string denotes either the commit to fetch (a hexadecimal string),
+or the tag to fetch.  You can also use a ``short'' commit ID or a
+@command{git describe} style identifier such as
+@code{v1.0.1-10-g58d7909c97}.
 
 @item @code{recursive?} (default: @code{#f})
 This Boolean indicates whether to recursively fetch Git sub-modules.
@@ -7735,11 +7748,6 @@ is useful when a package contains multiple packages and you want to build
 only one of them.  This is equivalent to passing the @code{-p} argument to
 @code{dune}.
 
-The @code{#:profile} parameter can be passed to specify the
-@uref{https://dune.readthedocs.io/en/stable/dune-files.html#profile,
-dune build profile}. This is equivalent to passing the @code{--profile}
-argument to @code{dune}. Its default value is @code{"release"}.
-
 @end defvr
 
 @defvr {Scheme Variable} go-build-system
@@ -7763,6 +7771,13 @@ Packages that provide Go libraries should install their source code into
 the built output.  The key @code{#:install-source?}, which defaults to
 @code{#t}, controls whether or not the source code is installed.  It can
 be set to @code{#f} for packages that only provide executable files.
+
+Packages can be cross-built, and if a specific architecture or operating
+system is desired then the keywords @code{#:goarch} and @code{#:goos}
+can be used to force the package to be built for that architecture and
+operating system.  The combinations known to Go can be found
+@url{"https://golang.org/doc/install/source#environment", in their
+documentation}.
 @end defvr
 
 @defvr {Scheme Variable} glib-or-gtk-build-system
@@ -10656,7 +10671,8 @@ guix build --with-branch=guile-sqlite3=master cuirass
 @item --with-commit=@var{package}=@var{commit}
 This is similar to @option{--with-branch}, except that it builds from
 @var{commit} rather than the tip of a branch.  @var{commit} must be a valid
-Git commit SHA1 identifier or a tag.
+Git commit SHA1 identifier, a tag, or a @command{git describe} style
+identifier such as @code{1.0-3-gabc123}.
 
 @item --with-patch=@var{package}=@var{file}
 Add @var{file} to the list of patches applied to @var{package}, where
@@ -11606,6 +11622,10 @@ contained in the GnuPG keyring at
 signatures,, emacs, The GNU Emacs Manual}).
 
 @item
+@uref{https://elpa.nongnu.org/nongnu/, NonGNU}, selected by the
+@code{nongnu} identifier.
+
+@item
 @uref{https://stable.melpa.org/packages, MELPA-Stable}, selected by the
 @code{melpa-stable} identifier.
 
@@ -11920,6 +11940,40 @@ the updater for @uref{https://launchpad.net, Launchpad} packages.
 @item generic-html
 a generic updater that crawls the HTML page where the source tarball of
 the package is hosted, when applicable.
+
+@item generic-git
+a generic updater for packages hosted on Git repositories.  It tries to
+be smart about parsing Git tag names, but if it is not able to parse the
+tag name and compare tags correctly, users can define the following
+properties for a package.
+
+@itemize
+@item @code{release-tag-prefix}: a regular expression for matching a prefix of
+the tag name.
+
+@item @code{release-tag-suffix}: a regular expression for matching a suffix of
+the tag name.
+
+@item @code{release-tag-version-delimiter}: a string used as the delimiter in
+the tag name for separating the numbers of the version.
+
+@item @code{accept-pre-releases}: by default, the updater will ignore
+pre-releases; to make it also look for pre-releases, set the this
+property to @code{#t}.
+
+@end itemize
+
+@lisp
+(package
+  (name "foo")
+  ;; ...
+  (properties
+    '((release-tag-prefix . "^release0-")
+      (release-tag-suffix . "[a-z]?$")
+      (release-tag-version-delimiter . ":"))))
+@end lisp
+
+
 @end table
 
 For instance, the following command only checks for updates of Emacs
@@ -12589,6 +12643,20 @@ $ guix graph --path -t references emacs libunistring
 /gnu/store/@dots{}-libidn2-2.2.0
 /gnu/store/@dots{}-libunistring-0.9.10
 @end example
+
+Sometimes you still want to visualize the graph but would like to trim
+it so it can actually be displayed.  One way to do it is via the
+@option{--max-depth} (or @option{-M}) option, which lets you specify the
+maximum depth of the graph.  In the example below, we visualize only
+@code{libreoffice} and the nodes whose distance to @code{libreoffice} is
+at most 2:
+
+@example
+guix graph -M 2 libreoffice | xdot -f fdp -
+@end example
+
+Mind you, that's still a big ball of spaghetti, but at least
+@command{dot} can render it quickly and it can be browsed somewhat.
 
 The available options are the following:
 

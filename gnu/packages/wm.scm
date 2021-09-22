@@ -45,6 +45,7 @@
 ;;; Copyright © 2021 Sharlatan Hellseher <sharlatanus@gmail.com>
 ;;; Copyright © 2021 qblade <qblade@protonmail.com>
 ;;; Copyright © 2021 lasnesne <lasnesne@lagunposprasihopre.org>
+;;; Copyright © 2021 Petr Hodina <phodina@protonmail.com>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -384,14 +385,14 @@ from many programming languages.")
 (define-public i3lock
   (package
     (name "i3lock")
-    (version "2.11.1")
+    (version "2.13")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://i3wm.org/i3lock/i3lock-"
                                   version ".tar.bz2"))
               (sha256
                (base32
-                "015dn534m7cxjvqdncpvaq9p8b2r4w5hp1yanbdy2abmhbcc7a7j"))))
+                "02szjsaz7rqrdkd0r2nwgwa85c4hwfrcskxw7ryk695kmjcfhzv3"))))
     (build-system gnu-build-system)
     (native-inputs
      `(("pkg-config" ,pkg-config)))
@@ -410,6 +411,43 @@ from many programming languages.")
      "i3lock is a simple X11 screen locker developed alongside the i3 project.
 Despite the name it should work with any X11 window manager.")
     (license license:bsd-3)))
+
+(define-public i3lock-blur
+  (package
+    (name "i3lock-blur")
+    (version "2.10")
+    (source (origin
+              (method git-fetch)
+              (uri
+               (git-reference
+                (url "https://github.com/karulont/i3lock-blur")
+                (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1bd5nrlga5g1sz1f64gnc3dqy8yfrr4q1ss59krymbpxa1hhf55c"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     `(("pkg-config" ,pkg-config)
+       ("automake" ,automake)
+       ("autoconf" ,autoconf)))
+    (inputs
+     `(("cairo" ,cairo)
+       ("mesa" ,mesa)
+       ("libev" ,libev)
+       ("linux-pam" ,linux-pam)
+       ("libxcb" ,libxcb)
+       ("libxkbcommon" ,libxkbcommon)
+       ("xcb-util" ,xcb-util)
+       ("xcb-util-image" ,xcb-util-image)
+       ("xcb-util-xrm" ,xcb-util-xrm)))
+    (home-page "https://github.com/karulont/i3lock-blur")
+    (synopsis "Lightweight screen locker with transparent blurring background")
+    (description
+     "Simple X11 screen locker with transparent blurring background developed
+alongside the i3 project.  Despite the name it should work with any X11 window
+manager.")
+    (license license:expat)))
 
 (define-public i3blocks
   (package
@@ -645,6 +683,7 @@ Features include:
     (inputs
      `(("imagemagick" ,imagemagick)
        ("wmctrl" ,wmctrl)
+       ("i3lock" ,i3lock)
        ("gawk" ,gawk)))
     (home-page "https://github.com/meskarune/i3lock-fancy")
     (synopsis "Screen locker with screenshot function")
@@ -1577,6 +1616,38 @@ modules for building a Wayland compositor.")
     (synopsis "Screen locking utility for Wayland compositors")
     (description "Swaylock is a screen locking utility for Wayland compositors.")
     (license license:expat))) ; MIT license
+
+(define-public swaylock-effects
+  ;; Latest release is from November 2020, but doesn't support disabling SSE.
+  (let ((commit "5cb9579faaf5662b111f5722311b701eff1c1d00")
+        (revision "1"))
+    (package
+      (inherit swaylock)
+      (name "swaylock-effects")
+      (version (git-version "1.6-3" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/mortie/swaylock-effects")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "036dkhfqgk7g9vbr5pxgrs66h5fz0rwdsc67i1w51aa9v01r35ca"))))
+      (arguments
+       `(#:configure-flags '("-Dsse=false")
+         #:phases
+         (modify-phases %standard-phases
+           (add-after 'unpack 'patch-meson
+             (lambda _
+               (substitute* "meson.build"
+                 (("'-mtune=native',") "")))))))
+      (synopsis "Screen locking utility for Wayland compositors with effects")
+      (description "@code{Swaylock-effects} is a fork of swaylock with additional
+features, such as the ability to take a screenshot as the background image,
+display a clock or apply image manipulation techniques to the background image.")
+      (home-page "https://github.com/mortie/swaylock-effects"))))
 
 (define-public swaybg
   (package

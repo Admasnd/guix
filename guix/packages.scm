@@ -52,6 +52,7 @@
   #:re-export (%current-system
                %current-target-system
                search-path-specification)         ;for convenience
+  #:replace ((define-public* . define-public))
   #:export (content-hash
             content-hash?
             content-hash-algorithm
@@ -99,6 +100,7 @@
             package-supported-systems
             package-properties
             package-location
+            package-definition-location
             hidden-package
             hidden-package?
             package-superseded
@@ -360,6 +362,59 @@ name of its URI."
   ;; <https://lists.gnu.org/archive/html/guix-devel/2017-03/msg00790.html>.
   (fold delete %supported-systems '("mips64el-linux")))
 
+(define-syntax current-location-vector
+  (lambda (s)
+    "Like 'current-source-location' but expand to a literal vector with
+one-indexed line numbers."
+    ;; Storing a literal vector in .go files is more efficient than storing an
+    ;; alist: less initialization code, fewer relocations, etc.
+    (syntax-case s ()
+      ((_)
+       (match (syntax-source s)
+         (#f #f)
+         (properties
+          (let ((file   (assq-ref properties 'filename))
+                (line   (assq-ref properties 'line))
+                (column (assq-ref properties 'column)))
+            (and file line column
+                 #`#(#,file #,(+ 1 line) #,column)))))))))
+
+(define-inlinable (sanitize-location loc)
+  ;; Convert LOC to a vector or to #f.
+  (cond ((vector? loc) loc)
+        ((not loc) loc)
+        (else (vector (location-file loc)
+                      (location-line loc)
+                      (location-column loc)))))
+
+(define-syntax-parameter current-definition-location
+  ;; Location of the encompassing 'define-public'.
+  (const #f))
+
+(define-syntax define-public*
+  (lambda (s)
+    "Like 'define-public' but set 'current-definition-location' for the
+lexical scope of its body."
+    (define location
+      (match (syntax-source s)
+        (#f #f)
+        (properties
+         (let ((line   (assq-ref properties 'line))
+               (column (assq-ref properties 'column)))
+           ;; Don't repeat the file name since it's redundant with 'location'.
+           ;; Encode the whole thing so that it fits in a fixnum on 32-bit
+           ;; platforms, which leaves us 29 bits: 7 bits for COLUMN (which is
+           ;; almost always zero), and 22 bits for LINE.
+           (and line column
+                (logior (ash (logand #x7f column) 22)
+                        (logand (- (expt 2 22) 1) (+ 1 line))))))))
+
+    (syntax-case s ()
+      ((_ prototype body ...)
+       #`(define-public prototype
+           (syntax-parameterize ((current-definition-location
+                                  (lambda (s) #,location)))
+             body ...))))))
 
 ;; A package.
 (define-record-type* <package>
@@ -404,10 +459,12 @@ name of its URI."
 
   (properties package-properties (default '()))   ; alist for anything else
 
-  (location package-location
-            (default (and=> (current-source-location)
-                            source-properties->location))
-            (innate)))
+  (location package-location-vector
+            (default (current-location-vector))
+            (innate) (sanitize sanitize-location))
+  (definition-location package-definition-location-code
+                       (default (current-definition-location))
+                       (innate)))
 
 (set-record-type-printer! <package>
                           (lambda (package port)
@@ -424,6 +481,25 @@ name of its URI."
                                       (number->string (object-address
                                                        package)
                                                       16)))))
+
+(define (package-location package)
+  "Return the source code location of PACKAGE as a <location> record, or #f if
+it is not known."
+  (match (package-location-vector package)
+    (#f #f)
+    (#(file line column) (location file line column))))
+
+(define (package-definition-location package)
+  "Like 'package-location', but return the location of the definition
+itself--i.e., that of the enclosing 'define-public' form, if any, or #f."
+  (match (package-definition-location-code package)
+    (#f #f)
+    (code
+     (let ((column (bit-extract code 22 29))
+           (line   (bit-extract code 0 21)))
+      (match (package-location-vector package)
+        (#f #f)
+        (#(file _ _) (location file line column)))))))
 
 (define-syntax-rule (package/inherit p overrides ...)
   "Like (package (inherit P) OVERRIDES ...), except that the same

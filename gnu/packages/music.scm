@@ -42,6 +42,7 @@
 ;;; Copyright © 2021 Justin Veilleux <terramorpha@cock.li>
 ;;; Copyright © 2021 Felix Gruber <felgru@posteo.net>
 ;;; Copyright © 2021 Simon Streit <simon@netpanic.org>
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -553,7 +554,7 @@ It is a fork of Clementine aimed at music collectors and audiophiles.")
 (define-public cmus
   (package
     (name "cmus")
-    (version "2.8.0")
+    (version "2.9.1")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -562,7 +563,7 @@ It is a fork of Clementine aimed at music collectors and audiophiles.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1ydnvq13ay8b8mfmmgwi5qsgyf220yi1d01acbnxqn775dghmwar"))))
+                "0zjkimni2fhv4yskrjrgj6b74f33rfj58zgd7khwrz4z8nf88j0w"))))
     (build-system gnu-build-system)
     (arguments
      `(#:tests? #f ; cmus does not include tests
@@ -1894,7 +1895,7 @@ complete studio.")
        `(("liblo" ,liblo)
          ("gtkmm" ,gtkmm)
          ("alsa-lib" ,alsa-lib)
-         ("libxmlplusplus" ,libxmlplusplus-2.6)))
+         ("libxml++" ,libxml++-2)))
       (native-inputs
        `(("glib:bin" ,glib "bin")
          ("pkg-config" ,pkg-config)))
@@ -5018,7 +5019,7 @@ studio.")
 (define-public gsequencer
   (package
     (name "gsequencer")
-    (version "3.8.13")
+    (version "3.10.18")
     (source
      (origin
        (method git-fetch)
@@ -5027,7 +5028,7 @@ studio.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1gwy7fhbxgrd5n6afq1hnxc6p873wsh4qs63yhkkdfzyl7s412z4"))))
+        (base32 "126kbvdkxy82mmkl19qhp9k6iz5xclar06chbj7lf580x96c899c"))))
     (build-system glib-or-gtk-build-system)
     (arguments
      `(#:phases
@@ -6245,7 +6246,7 @@ Soul Force), MVerb, Nekobi, and ProM.")
 (define-public avldrums-lv2
   (package
     (name "avldrums-lv2")
-    (version "0.4.1")
+    (version "0.4.2")
     (source
      (origin
        (method git-fetch)
@@ -6257,7 +6258,7 @@ Soul Force), MVerb, Nekobi, and ProM.")
              (recursive? #t)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "1vwdp3d8qzd493qa99ddya7iql67bbfxmbcl8hk96lxif2lhmyws"))))
+        (base32 "14gka5g7va30gm1hn0cas4vvb8s764rfvzcxm67ww86hf54cpnig"))))
     (build-system gnu-build-system)
     (arguments
      `(#:tests? #f                      ; no "check" target
@@ -6265,10 +6266,10 @@ Soul Force), MVerb, Nekobi, and ProM.")
        (list (string-append "PREFIX=" (assoc-ref %outputs "out")))
        #:phases
        (modify-phases %standard-phases
+         (delete 'configure)            ; no configure script
          (add-before 'build 'set-CC-variable
            (lambda _
-             (setenv "CC" "gcc") #t))
-         (delete 'configure))))
+             (setenv "CC" "gcc"))))))
     (inputs
      `(("cairo" ,cairo)
        ("dssi" ,dssi)

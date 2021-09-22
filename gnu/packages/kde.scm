@@ -219,7 +219,7 @@ browser for easy news reading.")
     (license license:gpl2+)))
 
 (define-public kdenlive
-  (let ((version "20.08.3"))
+  (let ((version "21.08.1"))
     (package
       (name "kdenlive")
       (version version)
@@ -231,43 +231,43 @@ browser for easy news reading.")
                (commit (string-append "v" version))))
          (file-name (string-append name "-" version "-checkout"))
          (sha256
-          (base32 "0x0qfwf6wfnybjyjvmllpf87sm27d1n2akslhp2k8ins838qy55i"))))
-      (build-system cmake-build-system)
+          (base32 "1fvy2aa86pn4crk8lgxjh1kdn2lxzi66krnrr9m91mp89mmc760k"))))
+      (build-system qt-build-system)
       (native-inputs
        `(("extra-cmake-modules" ,extra-cmake-modules)
          ("pkg-config" ,pkg-config)
          ("qttools" ,qttools)))
       (inputs
-       `(("shared-mime-info" ,shared-mime-info)
-         ("frei0r-plugins" ,frei0r-plugins)
+       `(("breeze" ,breeze) ; make dark them available easily
+         ("breeze-icons" ,breeze-icons) ; recommended icon set
          ("ffmpeg" ,ffmpeg)
-         ("rttr" ,rttr)
-         ("mlt" ,mlt-6)
-         ("qtbase" ,qtbase-5)
-         ("qtscript" ,qtscript)
-         ("qtsvg" ,qtsvg)
-         ("qtmultimedia" ,qtmultimedia)
-         ("kparts" ,kparts)
-         ("knotifications" ,knotifications)
+         ("frei0r-plugins" ,frei0r-plugins)
          ("karchive" ,karchive)
-         ("kdbusaddons" ,kdbusaddons)
          ("kcrash" ,kcrash)
-         ("kguiaddons" ,kguiaddons)
-         ("knewstuff" ,knewstuff)
-         ("knotifyconfig" ,knotifyconfig)
-         ("kfilemetadata" ,kfilemetadata)
-         ("kdoctools" ,kdoctools)
+         ("kdbusaddons" ,kdbusaddons)
          ("kdeclarative" ,kdeclarative)
+         ("kdoctools" ,kdoctools)
+         ("kfilemetadata" ,kfilemetadata)
+         ("kguiaddons" ,kguiaddons)
+         ("kiconthemes" ,kiconthemes)
+         ("knewstuff" ,knewstuff)
+         ("knotifications" ,knotifications)
+         ("knotifyconfig" ,knotifyconfig)
+         ("kparts" ,kparts)
+         ("kplotting" ,kplotting)
+         ("mlt" ,mlt)
+         ("purpose" ,purpose)
+         ("qtbase" ,qtbase-5)
          ("qtdeclarative" ,qtdeclarative)
+         ("qtgraphicaleffects" ,qtgraphicaleffects)
+         ("qtmultimedia" ,qtmultimedia)
+         ("qtnetworkauth" ,qtnetworkauth)
          ("qtquickcontrols" ,qtquickcontrols)
          ("qtquickcontrols2" ,qtquickcontrols2)
-         ("kiconthemes" ,kiconthemes)
-         ("breeze" ,breeze) ; make dark them available easily
-         ("breeze-icons" ,breeze-icons) ; recommended icon set
-         ("purpose" ,purpose)
+         ("qtscript" ,qtscript)
+         ("qtsvg" ,qtsvg)
          ("qtwebkit" ,qtwebkit)
-         ("qtgraphicaleffects" ,qtgraphicaleffects)
-         ("kplotting" ,kplotting)))
+         ("shared-mime-info" ,shared-mime-info)))
       (arguments
        `(#:tests? #f                    ;TODO needs X
          #:phases
@@ -277,26 +277,16 @@ browser for easy news reading.")
                (let* ((out (assoc-ref outputs "out"))
                       (qtbase (assoc-ref inputs "qtbase"))
                       (frei0r (assoc-ref inputs "frei0r-plugins"))
-                      (ffmpeg (assoc-ref inputs "ffmpeg"))
-                      (breeze (assoc-ref inputs "breeze"))
-                      (breeze-icons (assoc-ref inputs "breeze-icons")))
+                      (ffmpeg (assoc-ref inputs "ffmpeg")))
                  (wrap-program (string-append out "/bin/kdenlive")
                    `("PATH" ":" prefix
                      ,(list (string-append ffmpeg "/bin")))
-                   `("XDG_DATA_DIRS" ":" prefix
-                     ,(list (string-append breeze "/share")
-                            (string-append breeze-icons "/share")))
-                   `("QT_PLUGIN_PATH" ":" prefix
-                     ,(list (getenv "QT_PLUGIN_PATH")))
                    `("FREI0R_PATH" ":" =
                      (,(string-append frei0r "/lib/frei0r-1/")))
                    `("QT_QPA_PLATFORM_PLUGIN_PATH" ":" =
                      (,(string-append qtbase "/lib/qt5/plugins/platforms")))
-                   `("QML2_IMPORT_PATH" ":" prefix
-                     ,(list (getenv "QML2_IMPORT_PATH")))
                    `("MLT_PREFIX" ":" =
-                     (,(assoc-ref inputs "mlt")))))
-               #t)))))
+                     (,(assoc-ref inputs "mlt"))))))))))
       (home-page "https://kdenlive.org")
       (synopsis "Non-linear video editor")
       (description "Kdenlive is an acronym for KDE Non-Linear Video Editor.
