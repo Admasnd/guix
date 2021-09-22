@@ -27140,8 +27140,47 @@ YYYY-MM-DD at the beginning of the file or directory name.")
         (uri (pypi-uri "onlykey-agent" version))
         (sha256
           (base32
-            "1586zhpph79s12alnyj1iiiwj0c5h1z8na2lqczf560p5mca6gxw"))))
+            "1586zhpph79s12alnyj1iiiwj0c5h1z8na2lqczf560p5mca6gxw"))
+        (modules '((guix build utils)))
+        (snippet
+         '(begin (substitute* "setup.py"
+                   (("scripts=\\['onlykey_agent.py'\\]") 
+                    "py_modules=['onlykey_agent']"))
+                 #t))))
     (build-system python-build-system)
+    (arguments
+     '(#:phases
+       (modify-phases %standard-phases
+         ;; prevents runtime error where shell wrapper for onlykey_agent.py is loaded as module
+         (replace 'wrap
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (define (list-of-files dir)
+               (find-files dir (lambda (file stat)
+                                 (and (eq? 'regular (stat:type stat))
+                                      (not (wrapper? file))
+                                      (not ((file-name-predicate "onlykey_agent.py") 
+                                            file 
+                                            stat))))))
+
+             (define bindirs
+               (let ((out (assoc-ref outputs "out"))) 
+                 (list (string-append out "/bin")
+                       (string-append out "/sbin"))))
+
+             (let* ((out  (assoc-ref outputs "out"))
+                    (python (assoc-ref inputs "python"))
+                    (var `("PYTHONPATH" prefix
+                           ,(cons (string-append out "/lib/python"
+                                                 (python-version python)
+                                                 "/site-packages")
+                                  (search-path-as-string->list
+                                   (or (getenv "PYTHONPATH") ""))))))
+               (for-each (lambda (dir)
+                           (let ((files (list-of-files dir)))
+                             (for-each (lambda (file) (wrap-program file var)) 
+                                       files)))
+                         bindirs)
+               #t))))))
     (propagated-inputs
       `(("python-lib-agent" ,python-lib-agent)
         ("python-onlykey" ,python-onlykey)))
