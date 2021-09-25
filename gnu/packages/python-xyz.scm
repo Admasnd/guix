@@ -27137,8 +27137,28 @@ YYYY-MM-DD at the beginning of the file or directory name.")
         (uri (pypi-uri "lib-agent" version))
         (sha256
           (base32
-            "07vrmgnbwsadqih4icml8v7jb4x8sm4vfcf5qqxdar0cakl96ml4"))))
+            "07vrmgnbwsadqih4icml8v7jb4x8sm4vfcf5qqxdar0cakl96ml4"))
+        (modules '((guix build utils)))
+        (snippet
+         '(begin (substitute* "libagent/device/onlykey.py"
+                   (("class Onlykey\\(interface\\.Device\\):" 
+                     ) 
+                    (string-append  
+                                   "\n" 
+                                   "    def __str__(self):\n        return 'onlykey'\n\n"))
+                   )
+                 #t))))
     (build-system python-build-system)
+    ;; (arguments
+    ;;  `(#:phases
+    ;;    (modify-phases %standard-phases
+    ;;      ;; patch to fix runtime issue
+    ;;      (add-before 'install 'patch-onlykey-class
+    ;;        (lambda _
+    ;;          (substitute* "libagent/device/onlykey.py"
+    ;;            (("(class Onlykey\\(interface.Device\\): *\"\"\".+\"\"\" *)" 
+    ;;              class) 
+    ;;             (string-append class "\n" "    def __str__(self):\n        return 'onlykey'\n\n") )))))))
     (propagated-inputs
       `(("python-backports.shutil-which"
          ,python-backports.shutil-which)
