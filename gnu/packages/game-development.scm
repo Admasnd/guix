@@ -15,13 +15,14 @@
 ;;; Copyright © 2017, 2019 Rutger Helling <rhelling@mykolab.com>
 ;;; Copyright © 2018 Marius Bakke <mbakke@fastmail.com>
 ;;; Copyright © 2019 Pierre Neidhardt <mail@ambrevar.xyz>
-;;; Copyright © 2019, 2020, 2021 Leo Prikler <leo.prikler@student.tugraz.at>
+;;; Copyright © 2019, 2020, 2021 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2019 Jethro Cao <jethrocao@gmail.com>
 ;;; Copyright © 2020, 2021 Nicolas Goaziou <mail@nicolasgoaziou.fr>
 ;;; Copyright © 2020 Timotej Lazar <timotej.lazar@araneo.si>
 ;;; Copyright © 2020 Giacomo Leidi <goodoldpaul@autistici.org>
 ;;; Copyright © 2021 Alexandru-Sergiu Marton <brown121407@posteo.ro>
 ;;; Copyright © 2021 Dmitry Polyakov <polyakov@liltechdude.xyz>
+;;; Copyright © 2020-2021 James Smith <jsubuntuxp@disroot.org>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -39,7 +40,7 @@
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (gnu packages game-development)
-  #:use-module (srfi srfi-1)
+  #:use-module ((srfi srfi-1) #:hide (zip))
   #:use-module (ice-9 match)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages)
@@ -55,6 +56,7 @@
   #:use-module (gnu packages audio)
   #:use-module (gnu packages autotools)
   #:use-module (gnu packages base)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages boost)
   #:use-module (gnu packages compression)
   #:use-module (gnu packages check)
@@ -99,6 +101,7 @@
   #:use-module (gnu packages tls)
   #:use-module (gnu packages video)
   #:use-module (gnu packages web)
+  #:use-module (gnu packages wxwidgets)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages xiph)
   #:use-module (gnu packages xml)
@@ -447,10 +450,71 @@ GUI toolkit, lighting and physics frameworks and @code{Tiled} TMX format
 support.")
     (license license:gpl3+)))
 
+(define-public slade
+  (package
+    (name "slade")
+    (version "3.1.13")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/sirjuddington/SLADE")
+             (commit version)))
+       (sha256 (base32 "009yc5m6y074wfalvwbrnv2zsmaf9yhbi8hzgs973di0zqnqv011"))
+       (file-name (git-file-name name version))))
+    (build-system cmake-build-system)
+    (arguments
+     '(#:configure-flags
+       (list "-DWX_GTK3=ON" "-DNO_WEBVIEW=ON"
+             (string-append "-DWITH_WXPATH="
+                            (assoc-ref %build-inputs "wxwidgets") "/bin")
+             (string-append "-DwxWidgets_LIBRARIES="
+                            (assoc-ref %build-inputs "wxwidgets") "/lib"))
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'build 'reset-slade.pk3-timestamps
+           ;; This is neccessary to make slade reproducible due to
+           ;; <https://bugs.gnu.org/44741>.  TODO: Remove on next core update
+           ;; cycle.
+           (lambda _
+             (invoke "find" "../source/dist/res" "-exec" "touch"
+                     "--no-dereference" "-t" "197001010000.00" "{}"
+                     "+")))
+         (add-after 'install 'wrap-with-x11-gdk-backend
+           ;; Set GDK_BACKEND to x11 to prevent crash on Wayland.
+           ;; See https://github.com/sirjuddington/SLADE/issues/1097 for details.
+           (lambda* (#:key outputs #:allow-other-keys)
+             (wrap-program
+                 (string-append (assoc-ref outputs "out")
+                                "/bin/slade")
+               '("GDK_BACKEND" = ("x11"))))))
+       #:tests? #f)) ;; No test suite.
+    (inputs
+     `(("bash" ,bash-minimal)
+       ("curl" ,curl)
+       ("fluidsynth" ,fluidsynth)
+       ("freeimage" ,freeimage)
+       ("ftgl" ,ftgl)
+       ("glew" ,glew)
+       ("gtk+" ,gtk+)
+       ("sfml" ,sfml)
+       ("wxwidgets" ,wxwidgets-3.1)))
+    (native-inputs
+     `(("pkg-config" ,pkg-config)
+       ("which" ,which)
+       ("zip" ,zip)))
+    (home-page "https://slade.mancubus.net")
+    (synopsis "Doom game data editor")
+    (description "SLADE3 is a modern editor for Doom-engine based games and
+source ports.  It has the ability to view, modify, and write many different game-
+specific formats, and even convert between some of them, or from/to other generic
+formats such as PNG.")
+    (license license:gpl2+)))
+
 (define-public tiled
   (package
     (name "tiled")
-    (version "1.5.0")
+    (version "1.7.2")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -459,7 +523,7 @@ support.")
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1prajkx1xpp3csa0xpkrn3c2cnzvmwzxgrqb9d3gqszp3sllr2dg"))))
+                "1ifxh3sv6gz32gahgi7ba0ivcw5mfgwnrw6iycpav150w9xla43i"))))
     (build-system gnu-build-system)
     (inputs
      `(("qtbase" ,qtbase-5)
@@ -758,35 +822,39 @@ programming language.")
     (license license:zlib)))
 
 (define-public love-nuklear
-  (let ((version "v2.6")
-        (commit "fef4e00a602efb16c57ae962850b6e7a01f7a29a"))
-    (package
-      (name "love-nuklear")
-      (version (git-version version "1" commit))
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/keharriso/love-nuklear/")
-                      (commit commit)
-                      (recursive? #t)))
-                ;; NOTE: the HEAD of the Nuklear git-submodule is at commit
-                ;; "adc52d710fe3c87194b99f540c53e82eb75c2521" of Oct 1 2019
-                (file-name (git-file-name name version))
-                (sha256
-                 (base32
-                  "15qmy8mfwkxy2x9rmxs6f9cyvjvwwj6yf78bs863xmc56dmjzzbn"))))
-      (build-system cmake-build-system)
-      (arguments
-       `(#:build-type "Release"
-         #:tests? #f))
-      (inputs
-       `(("luajit" ,luajit)))
-      (synopsis "Lightweight immediate mode GUI for LÖVE games")
-      (description "LÖVE is a Lua framework for making 2D games.  Nuklear
+  (package
+    (name "love-nuklear")
+    (version "2.6.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/keharriso/love-nuklear/")
+                    (commit (string-append "v" version))
+                    (recursive? #t)))
+              ;; NOTE: the HEAD of the Nuklear git-submodule is at commit
+              ;; "adc52d710fe3c87194b99f540c53e82eb75c2521" of Oct 1 2019
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "090xp5c975155hd1pa7bdssdlawvygs5s6icdkwbyc8il5kg5kgv"))))
+    (build-system cmake-build-system)
+    (arguments
+     `(#:build-type "Release"
+       #:tests? #f
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'patch-cmake
+           (lambda _
+             (substitute* "CMakeLists.txt"
+               (("DESTINATION .") "DESTINATION lib/love")))))))
+    (inputs
+     `(("luajit" ,luajit)))
+    (synopsis "Lightweight immediate mode GUI for LÖVE games")
+    (description "LÖVE is a Lua framework for making 2D games.  Nuklear
 is a minimal state immediate mode graphical user interface toolkit.  This
 package is the Nuklear bindings for LÖVE created by Kevin Harrison.")
-      (home-page "https://github.com/keharriso/love-nuklear/")
-      (license license:expat))))
+    (home-page "https://github.com/keharriso/love-nuklear/")
+    (license license:expat)))
 
 (define-public allegro-4
   (package

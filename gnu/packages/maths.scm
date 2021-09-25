@@ -2045,6 +2045,77 @@ linear and quadratic objectives.  There are limited facilities for nonlinear
 and quadratic objectives using the Simplex algorithm.")
     (license license:epl1.0)))
 
+(define-public gecode
+  (package
+    (name "gecode")
+    (version "6.2.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/Gecode/gecode")
+                    (commit (string-append "release-" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0b1cq0c810j1xr2x9y9996p894571sdxng5h74py17c6nr8c6dmk"))
+              (modules '((guix build utils)))
+              (snippet
+               '(begin
+                  ;; delete generated sources
+                  (for-each delete-file
+                            '("gecode/kernel/var-imp.hpp"
+                              "gecode/kernel/var-type.hpp"))))))
+    (outputs '("out" "examples"))
+    (build-system gnu-build-system)
+    (arguments
+     `(#:configure-flags
+       (list (string-append "GLDFLAGS=-Wl,-rpath="
+                            (assoc-ref %outputs "out")
+                            "/lib")
+             "--enable-examples=no")
+       #:modules ((guix build gnu-build-system)
+                  (guix build utils)
+                  (ice-9 rdelim)
+                  (ice-9 popen))
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'build 'build-examples
+           (lambda* (#:key outputs #:allow-other-keys)
+             (invoke "make" "compileexamples")))
+         ;; The Makefile disrespects GLDFLAGS for some reason, so we have to
+         ;; patch it ourselves... *sigh*
+         (add-after 'install 'fix-rpath
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let ((libdir (string-append (assoc-ref outputs "out") "/lib")))
+               (for-each
+                (lambda (file)
+                  (let* ((pipe (open-pipe* OPEN_READ "patchelf"
+                                          "--print-rpath" file))
+                         (line (read-line pipe)))
+                    (and (zero? (close-pipe pipe))
+                         (invoke "patchelf" "--set-rpath"
+                                 (string-append libdir ":" line)
+                                 file))))
+                (find-files libdir ".*\\.so$")))))
+         (add-after 'install 'install-examples
+           (lambda* (#:key outputs #:allow-other-keys)
+             (invoke "make" "installexamples"
+                     (string-append "bindir=" (assoc-ref outputs "examples")
+                                    "/bin"))))
+         ;; Tests depend on installed libraries.
+         (delete 'check)
+         (add-after 'fix-rpath 'check
+           (assoc-ref %standard-phases 'check)))))
+    (native-inputs
+     `(("patchelf" ,patchelf)
+       ("perl" ,perl)
+       ("sed" ,sed)))
+    (home-page "https://www.gecode.org")
+    (synopsis "Toolkit for developing constraint-based systems")
+    (description "Gecode is a C++ toolkit for developing constraint-based
+systems and applications.  It provides a modular and extensible solver.")
+    (license license:expat)))
+
 (define-public libflame
   (package
     (name "libflame")
@@ -3022,6 +3093,136 @@ associated, high-level theorems, e.g.@: the fundamental theorem of arithmetic,
 the Cauchy-Schwarz inequality, Stirling's formula, etc.  See the Metamath
 book.")
     (license license:gpl2+)))
+
+(define-public minizinc
+  (package
+    (name "minizinc")
+    (version "2.5.5")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/MiniZinc/libminizinc")
+                    (commit version)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "10b2hsl1fx9psh0iagmp8ki3f60f3qg5hmvra5aczjlfmbl88ggp"))
+              (modules '((guix build utils)
+                         (ice-9 ftw)
+                         (srfi srfi-1)))
+              (snippet
+               '(begin
+                  ;; Do not advertise proprietary solvers
+                  (with-directory-excursion "cmake/targets"
+                    (let ((targets '("libminizinc_fzn.cmake"
+                                     "libminizinc_gecode.cmake"
+                                     "libminizinc_mip.cmake"
+                                     "libminizinc_nl.cmake"
+                                     "libminizinc_osicbc.cmake"
+                                     "libminizinc_parser.cmake"
+                                     "libmzn.cmake"
+                                     "minizinc.cmake"
+                                     "mzn2doc.cmake")))
+                     (for-each delete-file
+                              (remove
+                               (lambda (file)
+                                 (member file (cons* "." ".." targets)))
+                               (scandir ".")))
+                    (substitute* "libmzn.cmake"
+                      (("include\\(cmake/targets/(.*)\\)" all target)
+                       (if (member target targets) all "")))))
+                  (with-directory-excursion "include/minizinc/solvers/MIP"
+                    (for-each delete-file
+                              (remove
+                               (lambda (file)
+                                 (member file '("." ".."
+                                                "MIP_osicbc_solverfactory.hh"
+                                                "MIP_osicbc_wrap.hh"
+                                                "MIP_solverinstance.hh"
+                                                "MIP_solverinstance.hpp"
+                                                "MIP_wrap.hh")))
+                               (scandir "."))))
+                  (with-directory-excursion "solvers/MIP"
+                    (for-each delete-file
+                              (remove
+                               (lambda (file)
+                                 (member file '("." ".."
+                                                "MIP_osicbc_solverfactory.cpp"
+                                                "MIP_osicbc_wrap.cpp"
+                                                "MIP_solverinstance.cpp"
+                                                "MIP_wrap.cpp")))
+                               (scandir "."))))
+                  (substitute* "CMakeLists.txt"
+                    (("find_package\\(([^ ]*).*\\)" all pkg)
+                     (if (member pkg '("Gecode" "OsiCBC" "Threads"))
+                         all
+                         "")))
+                  ;; TODO: swap out miniz for zlib
+                  #t))))
+    (build-system cmake-build-system)
+    (arguments
+     `(#:tests? #f ; no ‘check’ target
+       #:modules ((guix build cmake-build-system)
+                  (guix build utils)
+                  (srfi srfi-1))
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'install 'install-solver-configs
+           (lambda* (#:key inputs outputs #:allow-other-keys)
+             (let ((gecode (assoc-ref inputs "gecode"))
+                   (pkgdatadir (string-append (assoc-ref outputs "out")
+                                                  "/share/minizinc")))
+               (call-with-output-file (string-append pkgdatadir
+                                                     "/Preferences.json")
+                 (lambda (port)
+                   (display "\
+{
+  \"tagDefaults\": [
+    [\"\", \"org.gecode.gecode\"],
+    [\"gecode\", \"org.gecode.gecode\"]
+  ],
+  \"solverDefaults\": []
+}"
+                            port)
+                   (newline port)))
+
+               (mkdir-p (string-append pkgdatadir "/solvers"))
+               (call-with-output-file (string-append pkgdatadir
+                                                     "/solvers/gecode.msc")
+                 (lambda (port)
+                   (format port
+                    "\
+{
+  \"id\": \"org.gecode.gecode\",
+  \"name\": \"Gecode\",
+  \"description\": \"Gecode FlatZinc executable\",
+  \"version\": ~s,
+  \"mznlib\": ~s,
+  \"executable\": ~s,
+  \"supportsMzn\": false,
+  \"supportsFzn\": true,
+  \"needsSolns2Out\": true,
+  \"needsMznExecutable\": false,
+  \"needsStdlibDir\": false,
+  \"isGUIApplication\": false
+}"
+                    (last (string-split gecode #\-))
+                    (string-append gecode "/share/gecode/mznlib")
+                    (string-append gecode "/bin/fzn-gecode"))
+                   (newline port)))))))))
+    (native-inputs
+     `(("bison" ,bison)
+       ("flex" ,flex)))
+    (inputs
+     `(("cbc" ,cbc)
+       ("gecode" ,gecode)
+       ("zlib" ,zlib)))
+    (home-page "https://www.minizinc.org")
+    (synopsis "High-level constraint modeling language")
+    (description "MiniZinc is a high-level modeling language for constraint
+satisfaction and optimization problems.  Models are compiled to FlatZinc, a
+language understood by many solvers.")
+    (license license:mpl2.0)))
 
 (define-public mumps
   (package
@@ -6891,6 +7092,29 @@ when an application performs repeated divisions by the same divisor.")
                   "05mm4vrxsac35hjf5djif9r6rdxj9ippg97ia3p6q6b8lrp7srwv"))
                 (patches (search-patches "fp16-system-libraries.patch"))))
       (build-system cmake-build-system)
+      (arguments
+       `(#:imported-modules ((guix build python-build-system)
+                             ,@%cmake-build-system-modules)
+         #:modules (((guix build python-build-system)
+                     #:select (site-packages))
+                    (guix build cmake-build-system)
+                    (guix build utils))
+         #:phases (modify-phases %standard-phases
+                    (add-after 'install 'move-python-files
+                      (lambda* (#:key inputs outputs #:allow-other-keys)
+                        ;; Python files get installed to $includedir (!).
+                        ;; Move them to the usual Python site directory.
+                        (let* ((out     (assoc-ref outputs "out"))
+                               (include (string-append out "/include"))
+                               (site    (site-packages inputs outputs))
+                               (target  (string-append site "/fp16")))
+                          (mkdir-p target)
+                          (for-each (lambda (file)
+                                      (rename-file file
+                                                   (string-append target "/"
+                                                                  (basename
+                                                                   file))))
+                                    (find-files include "\\.py$"))))))))
       (native-inputs
        `(("python-wrapper" ,python-wrapper)))
       (inputs

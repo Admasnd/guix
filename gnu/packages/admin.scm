@@ -637,7 +637,7 @@ console.")
 (define-public htop
   (package
     (name "htop")
-    (version "3.0.5")
+    (version "3.1.0")
     (source
      (origin
        (method git-fetch)
@@ -645,7 +645,7 @@ console.")
              (url "https://github.com/htop-dev/htop")
              (commit version)))
        (sha256
-        (base32 "10lp6cbfvigzp6pq5nwj3s3l4vs7cv92krz2r08nwrz8vl6rqdzp"))
+        (base32 "1ngvidaka6xbfb3l4zxmlksk2ms93fy3sb76w7917kjgn9mh53zz"))
        (file-name (git-file-name name version))))
     (build-system gnu-build-system)
     (inputs
@@ -2144,15 +2144,15 @@ module slots, and the list of I/O ports (e.g. serial, parallel, USB).")
 (define-public acpica
   (package
     (name "acpica")
-    (version "20210604")
+    (version "20210730")
     (source (origin
               (method url-fetch)
               (uri (string-append
                     "https://acpica.org/sites/acpica/files/acpica-unix2-"
-                    version ".tar_0.gz"))
+                    version ".tar.gz"))
               (sha256
                (base32
-                "1wsgg6fx7bhbpfzhbpbq2r7jpmv4c4n7v0zidbh25swrz7kfgpwz"))))
+                "02z0492vrpk001m7xcy72lp7sd968lja3wp6jn3q6k9nm46h4v7h"))))
     (build-system gnu-build-system)
     (native-inputs `(("flex" ,flex)
                      ("bison" ,bison)))

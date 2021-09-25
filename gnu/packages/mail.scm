@@ -1174,7 +1174,7 @@ security functionality including PGP, S/MIME, SSH, and SSL.")
 (define-public mu
   (package
     (name "mu")
-    (version "1.6.5")
+    (version "1.6.6")
     (source (origin
               (method url-fetch)
               (uri (string-append "https://github.com/djcb/mu/releases/"
@@ -1182,7 +1182,7 @@ security functionality including PGP, S/MIME, SSH, and SSL.")
                                   "mu-" version ".tar.xz"))
               (sha256
                (base32
-                "0irqr1z1ljmij2vbj8dr8w9mbfalzikxr4s6340jjwmkmhaslh2h"))))
+                "1da3ykqnba3axggxyzsh3kjhy0rbdfdh9pnwprbzww56y8h3vka2"))))
     (build-system gnu-build-system)
     (native-inputs
      `(("pkg-config" ,pkg-config)
@@ -1740,14 +1740,14 @@ addons which can add many functionalities to the base client.")
 (define-public msmtp
   (package
     (name "msmtp")
-    (version "1.8.15")
+    (version "1.8.16")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://marlam.de/msmtp/releases/"
                            "/msmtp-" version ".tar.xz"))
        (sha256
-        (base32 "1klrj2a77671xb6xa0a0iyszhjb7swxhmzpzd4qdybmzkrixqr92"))))
+        (base32 "1n271yr83grpki9szdirnk6wb5rcc319f0gmfabyw3fzyf4msjy0"))))
     (build-system gnu-build-system)
     (inputs
      `(("libsecret" ,libsecret)
@@ -2835,14 +2835,14 @@ easily (one at a time).")
 (define-public mpop
   (package
     (name "mpop")
-    (version "1.4.13")
+    (version "1.4.14")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://marlam.de/mpop/releases/"
                            "mpop-" version ".tar.xz"))
        (sha256
-        (base32 "1hbx69d6ivbvjajrcp54fdb3g1ms4ydj0ybf3bfhlravqrk88jdk"))))
+        (base32 "046wbglvry54id9wik6c020fs09piv3gig3z0nh5nmyhsxjw4i18"))))
     (build-system gnu-build-system)
     (inputs
      `(("gnutls" ,gnutls)))
@@ -3878,14 +3878,14 @@ killed threads.")
 (define-public pan
   (package
     (name "pan")
-    (version "0.146")
+    (version "0.147")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "http://pan.rebelbase.com/download/releases/"
                            version "/source/" name "-" version ".tar.bz2"))
        (sha256
-        (base32 "17agd27sn4a7nahvkpg0w39kv74njgdrrygs74bbvpaj8rk2hb55"))))
+        (base32 "0960siaf0r6m18kv0d8aqpf36x2xbsfcvk07kswlany7jbxrhylr"))))
     (arguments
      `(#:configure-flags '("--with-gtk3" "--with-gtkspell" "--with-gnutls"
                            "--enable-libnotify" "--enable-manual"

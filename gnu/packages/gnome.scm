@@ -44,7 +44,7 @@
 ;;; Copyright © 2019 David Wilson <david@daviwil.com>
 ;;; Copyright © 2019, 2020 Raghav Gururajan <raghavgururajan@disroot.org>
 ;;; Copyright © 2019, 2020 Jonathan Brielmaier <jonathan.brielmaier@web.de>
-;;; Copyright © 2019, 2020, 2021 Leo Prikler <leo.prikler@student.tugraz.at>
+;;; Copyright © 2019, 2020, 2021 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2020 Oleg Pykhalov <go.wigust@gmail.com>
 ;;; Copyright © 2020 Pierre Neidhardt <mail@ambrevar.xyz>
 ;;; Copyright © 2020 raingloom <raingloom@riseup.net>
@@ -12070,7 +12070,7 @@ integrated profiler via Sysprof, debugging support, and more.")
 (define-public komikku
   (package
     (name "komikku")
-    (version "0.33.0")
+    (version "0.33.1")
     (source
      (origin
        (method git-fetch)
@@ -12080,7 +12080,7 @@ integrated profiler via Sysprof, debugging support, and more.")
        (file-name (git-file-name name version))
        (sha256
         (base32
-         "0359j8frhacgfyr1pjxbg7hk49v8wpybhpcpgyyxc799q4frlc97"))))
+         "00a2kz63bfyjan56d713afakv74bf6rcv6x5fxcmr6l5dmszjw8n"))))
     (build-system meson-build-system)
     (arguments
      `(#:glib-or-gtk? #t

@@ -30,12 +30,11 @@
 ;;; Copyright © 2018 Pierre-Antoine Rouby <pierre-antoine.rouby@inria.fr>
 ;;; Copyright © 2018, 2020 Brendan Tildesley <mail@brendan.scot>
 ;;; Copyright © 2018 Manuel Graf <graf@init.at>
-;;; Copyright © 2018 Pierre Langlois <pierre.langlois@gmx.com>
+;;; Copyright © 2018, 2019 Pierre Langlois <pierre.langlois@gmx.com>
 ;;; Copyright © 2018 Vasile Dumitrascu <va511e@yahoo.com>
 ;;; Copyright © 2019 Tim Gesthuizen <tim.gesthuizen@yahoo.de>
 ;;; Copyright © 2019, 2020, 2021 Maxim Cournoyer <maxim.cournoyer@gmail.com>
 ;;; Copyright © 2019 Stefan Stefanović <stefanx2ovic@gmail.com>
-;;; Copyright © 2019 Pierre Langlois <pierre.langlois@gmx.com>
 ;;; Copyright © 2019, 2020, 2021 Brice Waegeneire <brice@waegenei.re>
 ;;; Copyright © 2019 Kei Kebreau <kkebreau@posteo.net>
 ;;; Copyright © 2020, 2021 Oleg Pykhalov <go.wigust@gmail.com>
@@ -357,7 +356,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 
 ;; The current "stable" kernels. That is, the most recently released major
 ;; versions that are still supported upstream.
-(define-public linux-libre-5.14-version "5.14.6")
+(define-public linux-libre-5.14-version "5.14.7")
 (define-public linux-libre-5.14-gnu-revision "gnu")
 (define deblob-scripts-5.14
   (linux-libre-deblob-scripts
@@ -367,30 +366,15 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
 (define-public linux-libre-5.14-pristine-source
   (let ((version linux-libre-5.14-version)
-        (hash (base32 "1v6cicakpg0fdp74r2a4h46sj7rzpjdf4cscbr8y67kpd098r12l")))
+        (hash (base32 "1avypasvic298823xzpzzkjbmfv9s8bjnmq92ri62qbakx23j9dg")))
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-5.14)))
 
-(define-public linux-libre-5.13-version "5.13.19")
-(define-public linux-libre-5.13-gnu-revision "gnu1")
-(define deblob-scripts-5.13
-  (linux-libre-deblob-scripts
-   linux-libre-5.13-version
-   linux-libre-5.13-gnu-revision
-   (base32 "0hj3w3vh1rj24xgl4v72mr6vaz1qzsnc5xzdfjga1zy84bw8lhkp")
-   (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
-(define-public linux-libre-5.13-pristine-source
-  (let ((version linux-libre-5.13-version)
-        (hash (base32 "0yxbcd1k4l4cmdn0hzcck4s0yvhvq9fpwp120dv9cz4i9rrfqxz8")))
-   (make-linux-libre-source version
-                            (%upstream-linux-source version hash)
-                            deblob-scripts-5.13)))
-
 ;; The "longterm" kernels — the older releases with long-term upstream support.
 ;; Here are the support timelines:
 ;; <https://www.kernel.org/category/releases.html>
-(define-public linux-libre-5.10-version "5.10.67")
+(define-public linux-libre-5.10-version "5.10.68")
 (define-public linux-libre-5.10-gnu-revision "gnu1")
 (define deblob-scripts-5.10
   (linux-libre-deblob-scripts
@@ -400,12 +384,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
 (define-public linux-libre-5.10-pristine-source
   (let ((version linux-libre-5.10-version)
-        (hash (base32 "10lap66d84s1cfakbgfsbabgxm42060c4wcvpzxbi4r5g2m40mwc")))
+        (hash (base32 "08cl4bg9k331apj5fjl3jx6s6l543dnbjc1cfvin951m7l787ahv")))
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-5.10)))
 
-(define-public linux-libre-5.4-version "5.4.147")
+(define-public linux-libre-5.4-version "5.4.148")
 (define-public linux-libre-5.4-gnu-revision "gnu1")
 (define deblob-scripts-5.4
   (linux-libre-deblob-scripts
@@ -415,12 +399,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
 (define-public linux-libre-5.4-pristine-source
   (let ((version linux-libre-5.4-version)
-        (hash (base32 "07242nlxf4s73ffdir3dsi37cjmm6bw9w7kac0j7x1s1j8sh9h7n")))
+        (hash (base32 "1cwibh0y112hip5yd0n692rv44jh4sk2g6mj5n44g754k4i366a6")))
    (make-linux-libre-source version
                             (%upstream-linux-source version hash)
                             deblob-scripts-5.4)))
 
-(define-public linux-libre-4.19-version "4.19.206")
+(define-public linux-libre-4.19-version "4.19.207")
 (define-public linux-libre-4.19-gnu-revision "gnu1")
 (define deblob-scripts-4.19
   (linux-libre-deblob-scripts
@@ -430,12 +414,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
 (define-public linux-libre-4.19-pristine-source
   (let ((version linux-libre-4.19-version)
-        (hash (base32 "1h44lvzxd0cngj71bk8qba9dz7jlqj68ir6xjwfafglb81ppgsxp")))
+        (hash (base32 "1fb658n89xf9asnaqi0bnh64ir2f78bdqyjvfb983qad9wqsadym")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.19)))
 
-(define-public linux-libre-4.14-version "4.14.246")
+(define-public linux-libre-4.14-version "4.14.247")
 (define-public linux-libre-4.14-gnu-revision "gnu1")
 (define deblob-scripts-4.14
   (linux-libre-deblob-scripts
@@ -445,12 +429,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
 (define-public linux-libre-4.14-pristine-source
   (let ((version linux-libre-4.14-version)
-        (hash (base32 "0fpgig84shpas1jc0h4s3aw9brkcq1as84gjbk4bfhc48bpi4mlw")))
+        (hash (base32 "1kdhlsqpmw68xnfiyx98id8wis6kkxca2d4n7w2ncax0kyzrwyz7")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.14)))
 
-(define-public linux-libre-4.9-version "4.9.282")
+(define-public linux-libre-4.9-version "4.9.283")
 (define-public linux-libre-4.9-gnu-revision "gnu1")
 (define deblob-scripts-4.9
   (linux-libre-deblob-scripts
@@ -460,12 +444,12 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
 (define-public linux-libre-4.9-pristine-source
   (let ((version linux-libre-4.9-version)
-        (hash (base32 "059fin4si93ya13xy831w84q496ksxidpd3kyw38918sfy4p6wk7")))
+        (hash (base32 "0pdh1lyhdp5c5n39wpr622kgchgf30iqk853a2rv9m3s3fry50lm")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.9)))
 
-(define-public linux-libre-4.4-version "4.4.283")
+(define-public linux-libre-4.4-version "4.4.284")
 (define-public linux-libre-4.4-gnu-revision "gnu1")
 (define deblob-scripts-4.4
   (linux-libre-deblob-scripts
@@ -475,7 +459,7 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
    (base32 "1a0k9i8gnzkyvfr80f8xw2fnxfwddhz1pzicz9fh0y3jzzkzk45p")))
 (define-public linux-libre-4.4-pristine-source
   (let ((version linux-libre-4.4-version)
-        (hash (base32 "1d9v4h4cbc4i371lhhwpxbmg88gna6xyi2ahfvv0clz60802y982")))
+        (hash (base32 "00xkd2p181cfkys4nri93xy7snmn8g2481x3qz0js7g9p3kz5bqf")))
     (make-linux-libre-source version
                              (%upstream-linux-source version hash)
                              deblob-scripts-4.4)))
@@ -510,14 +494,6 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
 
 (define-public linux-libre-5.14-source
   (source-with-patches linux-libre-5.14-pristine-source
-                       (list %boot-logo-patch
-                             %linux-libre-arm-export-__sync_icache_dcache-patch
-                             ;; Pinebook Pro patch to fix LCD display
-                             (search-patch
-                              "linux-libre-arm64-generic-pinebook-lcd.patch"))))
-
-(define-public linux-libre-5.13-source
-  (source-with-patches linux-libre-5.13-pristine-source
                        (list %boot-logo-patch
                              %linux-libre-arm-export-__sync_icache_dcache-patch
                              ;; Pinebook Pro patch to fix LCD display
@@ -635,11 +611,6 @@ corresponding UPSTREAM-SOURCE (an origin), using the given DEBLOB-SCRIPTS."
   (make-linux-libre-headers* linux-libre-5.14-version
                              linux-libre-5.14-gnu-revision
                              linux-libre-5.14-source))
-
-(define-public linux-libre-headers-5.13
-  (make-linux-libre-headers* linux-libre-5.13-version
-                             linux-libre-5.13-gnu-revision
-                             linux-libre-5.13-source))
 
 (define-public linux-libre-headers-5.10
   (make-linux-libre-headers* linux-libre-5.10-version
@@ -949,18 +920,11 @@ It has been modified to remove all non-free binary blobs.")
                      '("x86_64-linux" "i686-linux" "armhf-linux" "aarch64-linux" "riscv64-linux")
                      #:configuration-file kernel-config))
 
-(define-public linux-libre-5.13
-  (make-linux-libre* linux-libre-5.13-version
-                     linux-libre-5.13-gnu-revision
-                     linux-libre-5.13-source
-                     '("x86_64-linux" "i686-linux" "armhf-linux" "aarch64-linux" "riscv64-linux")
-                     #:configuration-file kernel-config))
-
-(define-public linux-libre-version         linux-libre-5.13-version)
-(define-public linux-libre-gnu-revision    linux-libre-5.13-gnu-revision)
-(define-public linux-libre-pristine-source linux-libre-5.13-pristine-source)
-(define-public linux-libre-source          linux-libre-5.13-source)
-(define-public linux-libre                 linux-libre-5.13)
+(define-public linux-libre-version         linux-libre-5.14-version)
+(define-public linux-libre-gnu-revision    linux-libre-5.14-gnu-revision)
+(define-public linux-libre-pristine-source linux-libre-5.14-pristine-source)
+(define-public linux-libre-source          linux-libre-5.14-source)
+(define-public linux-libre                 linux-libre-5.14)
 
 (define-public linux-libre-5.10
   (make-linux-libre* linux-libre-5.10-version
@@ -1194,9 +1158,9 @@ It has been modified to remove all non-free binary blobs.")
 (define-public linux-libre-with-bpf
   (let ((base-linux-libre
          (make-linux-libre*
-          linux-libre-5.13-version
-          linux-libre-5.13-gnu-revision
-          linux-libre-5.13-source
+          linux-libre-5.14-version
+          linux-libre-5.14-gnu-revision
+          linux-libre-5.14-source
           '("x86_64-linux" "i686-linux" "armhf-linux"
             "aarch64-linux" "riscv64-linux")
           #:extra-version "bpf"
@@ -6786,7 +6750,7 @@ interface in sysfs, which can be accomplished with the included udev rules.")
 (define-public tlp
   (package
     (name "tlp")
-    (version "1.3.1")
+    (version "1.4.0")
     (source
      (origin
        (method git-fetch)
@@ -6795,7 +6759,7 @@ interface in sysfs, which can be accomplished with the included udev rules.")
              (commit version)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "14fcnaz9pw534v4d8dddqq4wcvpf1kghr8zlrk62r5lrl46sp1p5"))))
+        (base32 "0bnsz9bw9rj1apl80jwz39zj5mnlps3jbckihvl8bbdbrbhj6p06"))))
     (native-inputs
      `(("shellcheck" ,shellcheck)))
     (inputs
@@ -6846,6 +6810,8 @@ interface in sysfs, which can be accomplished with the included udev rules.")
                (setenv "TLP_CONFDEF"
                        (string-append out "/share/tlp/defaults.conf"))
                (setenv "TLP_CONFDIR" (string-append out "/etc/tlp.d"))
+               (setenv "TLP_CONFREN"
+                       (string-append out "/share/tlp/rename.conf"))
                (setenv "TLP_ELOD"
                        (string-append out "/lib/elogind/system-sleep"))
                (setenv "TLP_SHCPL"
@@ -7692,8 +7658,24 @@ IP addresses and routes, and configure IPsec.")
                (base32
                 "0dqf5j2sw4hq68rqvxbrsf44ygfzx9ypiyzipk4cvp9aimbvsbc6"))))
     (build-system meson-build-system)
+    ;; Install static libraries for use by the initrd's xfsprogs/static.
+    (outputs (list "out" "static"))
     (arguments
-     '(#:configure-flags '("-Ddistro_install=true" "-Ddefault_library=shared")))
+     `(#:configure-flags
+       (list "-Ddistro_install=true"
+             "-Ddefault_library=both")
+       #:phases
+       (modify-phases %standard-phases
+         (add-after 'install 'separate-static
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let ((out    (assoc-ref outputs "out"))
+                   (static (assoc-ref outputs "static")))
+               (with-directory-excursion out
+                 (for-each (lambda (source)
+                             (let ((target (string-append static "/" source)))
+                               (mkdir-p (dirname target))
+                               (rename-file source target)))
+                           (find-files "lib" "\\.a$")))))))))
     (home-page "https://github.com/benhoyt/inih")
     (synopsis "Simple .INI parser library for C")
     (description "The inih (INI Not Invented Here) library is a simple .INI file
@@ -7719,6 +7701,8 @@ compatible with Python's ConfigParser style of .INI files, including RFC
     (outputs (list "out" "python"))
     (arguments
      `(#:tests? #f   ; kernel/user integration tests are in package "xfstests"
+       #:make-flags
+       (list "V=1")
        #:phases
        (modify-phases %standard-phases
          (add-after 'install 'separate-python-output
@@ -7732,8 +7716,8 @@ compatible with Python's ConfigParser style of .INI files, including RFC
                                (string-append python script)))
                 (list "/sbin/xfs_scrub_all")))))
          (add-after 'install 'install-headers
-           (lambda _
-             (invoke "make" "install-dev"))))))
+           (lambda* (#:key make-flags #:allow-other-keys)
+             (apply invoke "make" "install-dev" make-flags))))))
     (native-inputs
      `(("gettext" ,gettext-minimal)))
     (inputs
@@ -7747,6 +7731,57 @@ file systems.")
     ;; The library "libhandle" and the headers in "xfslibs-dev" are
     ;; licensed under lgpl2.1. the other stuff is licensed under gpl2.
     (license (list license:gpl2 license:lgpl2.1))))
+
+(define-public xfsprogs/static
+  (package
+    (inherit xfsprogs)
+    (name "xfsprogs-static")
+    (outputs (list "out"))
+    (arguments
+     (substitute-keyword-arguments (package-arguments xfsprogs)
+       ((#:make-flags make-flags ''())
+        `(cons* "LLDFLAGS=-all-static" ,make-flags))
+       ((#:phases _ ''())
+        `(modify-phases %standard-phases
+           (add-after 'install 'delete-useless-files
+             (lambda* (#:key outputs #:allow-other-keys)
+               (with-directory-excursion (assoc-ref outputs "out")
+                 (for-each delete-file-recursively
+                           (list "include" "lib")))))))))
+    (inputs
+     `(("libinih:static" ,libinih "static")
+       ("util-linux:static" ,util-linux "static")
+       ,@(remove (match-lambda
+                   ((label . _)
+                    (member label '("python"))))
+                 (package-inputs xfsprogs))))
+    (synopsis "Statically linked XFS file system tools")))
+
+(define-public xfs_repair/static
+  (package
+    (name "xfs_repair-static")
+    (version (package-version xfsprogs/static))
+    (source #f)
+    (build-system trivial-build-system)
+    (arguments
+     `(#:modules ((guix build utils))
+       #:builder
+       (begin
+         (use-modules (guix build utils))
+         (let* ((xfsprogs (assoc-ref %build-inputs "xfsprogs"))
+                (out      (assoc-ref %outputs "out"))
+                (sbin     (string-append out "/sbin")))
+           (install-file (string-append xfsprogs "/sbin/xfs_repair") sbin)
+           (with-directory-excursion sbin
+             (remove-store-references "xfs_repair"))))))
+    (inputs
+     `(("xfsprogs" ,xfsprogs/static)))
+    (home-page (package-home-page xfsprogs/static))
+    (synopsis "Statically linked @command{xfs_repair} from xfsprogs")
+    (description
+     "This package provides a statically linked @command{xfs_repair} taken
+from the xfsprogs package.  It is meant to be used in initrds.")
+    (license (package-license xfsprogs/static))))
 
 (define-public genext2fs
   (package

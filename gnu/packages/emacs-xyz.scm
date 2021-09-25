@@ -55,7 +55,7 @@
 ;;; Copyright © 2019 Jelle Licht <jlicht@fsfe.org>
 ;;; Copyright © 2019 Björn Höfling <bjoern.hoefling@bjoernhoefling.de>
 ;;; Copyright © 2019 Stephen Webber <montokapro@gmail.com>
-;;; Copyright © 2019, 2021 Leo Prikler <leo.prikler@student.tugraz.at>
+;;; Copyright © 2019, 2021 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2019 David Wilson <david@daviwil.com>
 ;;; Copyright © 2020 Paul Garlick <pgarlick@tourbillion-technology.com>
 ;;; Copyright © 2020 Robert Smith <robertsmith@posteo.net>
@@ -74,7 +74,6 @@
 ;;; Copyright © 2020 Ryan Desfosses <rdes@protonmail.com>
 ;;; Copyright © 2020 Marcin Karpezo <sirmacik@wioo.waw.pl>
 ;;; Copyright © 2020 Fredrik Salomonsson <plattfot@gmail.com>
-;;; Copyright © 2020 Ryan Desfosses <rdes@protonmail.com>
 ;;; Copyright © 2020 Eric Bavier <bavier@posteo.net>
 ;;; Copyright © 2020, 2021 Morgan Smith <Morgan.J.Smith@outlook.com>
 ;;; Copyright © 2020 Peng Mei Yu <i@pengmeiyu.com>
@@ -23554,14 +23553,12 @@ constant expressions.")
     (propagated-inputs
      `(("emacs-dash" ,emacs-dash)
        ("emacs-docker-tramp" ,emacs-docker-tramp)
+       ("emacs-json-mode" ,emacs-json-mode)
        ("emacs-magit-popup" ,emacs-magit-popup)
        ("emacs-s" ,emacs-s)
        ("emacs-tablist" ,emacs-tablist)
-       ("emacs-json-mode" ,emacs-json-mode)))
-    (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (delete 'check)))) ;no tests
+       ("emacs-transient" ,emacs-transient)))
+    (arguments `(#:tests? #false))      ;no tests
     (build-system emacs-build-system)
     (home-page "https://github.com/Silex/docker.el")
     (synopsis "Manage docker from Emacs")
@@ -27114,14 +27111,14 @@ interface.")
 (define-public emacs-ivy-posframe
   (package
     (name "emacs-ivy-posframe")
-    (version "0.6.1")
+    (version "0.6.2")
     (source
      (origin
        (method url-fetch)
        (uri (string-append "https://elpa.gnu.org/packages/"
                            "ivy-posframe-" version ".tar"))
        (sha256
-        (base32 "1nay2sfbwm2fkp3f1y89innd9h6j3q70q9y4yddrwa69cxlj9m23"))))
+        (base32 "1x6pm0pry2j7yazhxvq1gydbymwll9yg85m8qi4sh8s0pnm0vjzk"))))
     (build-system emacs-build-system)
     (propagated-inputs
      `(("emacs-ivy" ,emacs-ivy)
@@ -29093,7 +29090,7 @@ s-expression.")
 (define-public emacs-map
   (package
     (name "emacs-map")
-    (version "3.1")
+    (version "3.2")
     (source
      (origin
        (method url-fetch)
@@ -29101,7 +29098,7 @@ s-expression.")
                            version ".tar"))
        (sha256
         (base32
-         "1akkp34psm71ylbf1i02m56ga1dkswhz069j98amixrhw20hq4nx"))))
+         "1ikgrwzzdz77qbflsccd63w8l4zs5zx9iarxn33kgx2dqrq2dmc6"))))
     (build-system emacs-build-system)
     (home-page "http://elpa.gnu.org/packages/map.html")
     (synopsis "Map manipulation functions")

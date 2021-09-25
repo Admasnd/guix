@@ -26,6 +26,7 @@
  (entry (commit "5b32ad4f6f555d305659cee825879df075b06331")
         (title
          (en "New @option{--max-depth} option for @command{guix graph}")
+         (de "Neue Option @option{--max-depth} für @command{guix graph}")
          (fr "Nouvelle option @option{--max-depth} pour @command{guix graph}"))
         (body
          (en "The @command{guix graph} command has a new @option{--max-depth}
@@ -40,6 +41,20 @@ guix graph -M 2 libreoffice | xdot -
 @end example
 
 See @command{info \"(guix) Invoking guix graph\"} for more information.")
+         (de "Der Befehl @command{guix graph} verfügt über eine neue
+Befehlszeilenoption @option{--max-depth} (oder @option{-M}), mit der
+Sie einen Graphen auf die angegebene Tiefe einschränken. Das ist vor
+allem bei großen Graphen nützlich; zum Beispiel zeigt der folgende
+Befehl, unter Verwendung des Pakets @code{xdot}, den
+Abhängigkeitsgraphen von LibreOffice unter Ausschluss der Knoten, die
+eine Distanz größer als 2 von LibreOffice selbst haben:
+
+@example
+guix graph -M 2 libreoffice | xdot -
+@end example
+
+Führen Sie @code{info \"(guix.de) Aufruf von guix graph\"} aus, um mehr zu
+erfahren.")
          (fr "La commande @command{guix graph} dispose d'une nouvelle option
 @option{--max-depth} (ou @option{-M}) pour restreindre la profondeur d'un
 graphe---très utile pour visualiser des gros graphes.  Par exemple, la
@@ -53,6 +68,42 @@ guix graph -M 2 libreoffice | xdot -
 
 Voir @command{info \"(guix.fr) Invoquer guix graph\"} pour plus
 d'informations.")))
+
+ (entry (commit "05f44c2d858a1e7b13c90362c35fa86bdc4d5a24")
+        (title
+         (en "Channel clones fall back to Software Heritage")
+         (de "Zum Klonen von Kanälen wird notfalls auf Software Heritage zurückgegriffen")
+         (fr "Les clones de canaux peuvent recourir à Software Heritage"))
+        (body
+         (en "When @command{guix time-machine} or @command{guix pull} fetches
+a channel pinned to a specific commit, it now automatically falls back to
+cloning it from the Software Heritage archive if the original URL is
+unreachable.  This contributes to long-term reproducibility.  See
+@command{info \"(guix) Replicating Guix\"}.
+
+Automatic fallback also works for other Git clones made on your behalf, such
+as when using @option{--with-commit} and related package transformation
+options.")
+         (de "Wenn bei @command{guix time-machine} oder @command{guix
+pull} ein bestimmter Commit eines Kanals bezogen werden soll, wird
+jetzt für den Fall, dass die ursprüngliche URL unerreichbar ist,
+automatisch vom Software-Heritage-Archiv geklont. Das trägt zur
+langfristigen Reproduzierbarkeit bei. Siehe @command{info \"(guix.de)
+Guix nachbilden\"}.
+
+Der automatische Rückgriff auf Software Heritage findet auch
+Verwendung bei anderen Arten von Git-Klon, die Guix durchführt, z.B.@:
+wenn Sie @option{--with-commit} und ähnliche Paketumwandlungsoptionen
+einsetzen.")
+         (fr "Quand la commande @command{guix time-machine} ou @command{guix
+pull} récupère un canal fixé à une révision spécifique, elle est maintenant
+capable de le cloner depuis l'archive Software Heritage si l'URL initiale
+n'est plus disponible.  Cela contribue à la reproductibilité à long terme.
+Voir @command{info \"(guix.fr) Répliquer Guix\"}.
+
+Ce recours à Software Heritage fonctionne aussi pour les autres clones Git que
+Guix peut faire, comme lorsqu'on utilise @option{--with-commit} et les options
+de transformation de paquet similaires.")))
 
  (entry (commit "82daab42811a2e3c7684ebdf12af75ff0fa67b99")
         (title

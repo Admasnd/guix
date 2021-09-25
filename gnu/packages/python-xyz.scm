@@ -42,7 +42,6 @@
 ;;; Copyright © 2017, 2020, 2021 Roel Janssen <roel@gnu.org>
 ;;; Copyright © 2017, 2018, 2019 Kei Kebreau <kkebreau@posteo.net>
 ;;; Copyright © 2017 Rutger Helling <rhelling@mykolab.com>
-;;; Copyright © 2017 Muriithi Frederick Muriuki <fredmanglis@gmail.com>
 ;;; Copyright © 2017, 2019, 2021 Brendan Tildesley <mail@brendan.scot>
 ;;; Copyright © 2018 Ethan R. Jones <ethanrjones97@gmail.com
 ;;; Copyright © 2018 Fis Trivial <ybbs.daans@hotmail.com>
@@ -72,9 +71,8 @@
 ;;; Copyright © 2020 Jakub Kądziołka <kuba@kadziolka.net>
 ;;; Copyright © 2020 sirgazil <sirgazil@zoho.com>
 ;;; Copyright © 2020 Sebastian Schott <sschott@mailbox.org>
-;;; Copyright © 2020 Alexandros Theodotou <alex@zrythm.org>
-;;; Copyright © 2020 Josh Marshall <joshua.r.marshall.1991@gmail.com>
 ;;; Copyright © 2020, 2021 Alexandros Theodotou <alex@zrythm.org>
+;;; Copyright © 2020 Josh Marshall <joshua.r.marshall.1991@gmail.com>
 ;;; Copyright © 2020 Lars-Dominik Braun <ldb@leibniz-psychology.org>
 ;;; Copyright © 2020 Alex ter Weele <alex.ter.weele@gmail.com>
 ;;; Copyright © 2020 Matthew James Kraai <kraai@ftbfs.org>
@@ -91,7 +89,7 @@
 ;;; Copyright © 2020, 2021 Bonface Munyoki Kilyungi <me@bonfacemunyoki.com>
 ;;; Copyright © 2020 Ekaitz Zarraga <ekaitz@elenq.tech>
 ;;; Copyright © 2020 Diego N. Barbato <dnbarbato@posteo.de>
-;;; Copyright © 2020 Leo Prikler <leo.prikler@student.tugraz.at>
+;;; Copyright © 2020 Liliana Marie Prikler <liliana.prikler@gmail.com>
 ;;; Copyright © 2019 Kristian Trandem <kristian@devup.no>
 ;;; Copyright © 2020, 2021 Zheng Junjie <873216071@qq.com>
 ;;; Copyright © 2021 Morgan Smith <Morgan.J.Smith@outlook.com>
@@ -5534,6 +5532,108 @@ algorithm.  Patiencediff provides a good balance of performance, nice output for
 humans, and implementation simplicity.")
     (license license:gpl2)))
 
+(define-public python-wmctrl
+  (package
+    (name "python-wmctrl")
+    (version "0.4")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "wmctrl" version))
+       (sha256
+        (base32
+         "1q0l1sqnj5wma87k3dsgmsyph464syjc6fl8qcpa41nan1rgzjv6"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'patch-paths
+                    (lambda* (#:key inputs #:allow-other-keys)
+                      (let ((wmctrl (assoc-ref inputs "wmctrl")))
+                        (substitute* "wmctrl.py"
+                          (("'wmctrl")
+                           (string-append "'" wmctrl "/bin/wmctrl")))))))))
+    (inputs `(("wmctrl" ,wmctrl)))
+    (home-page "https://github.com/antocuni/wmctrl")
+    (synopsis "Tool to programmatically control Xorg windows")
+    (description "This package provides a library for programmatically
+controlling Xorg windows using Python.  The library relies on the
+@command{wmctrl} to do so.")
+    (license license:expat)))
+
+(define-public python-fancycompleter
+  (package
+    (name "python-fancycompleter")
+    (version "0.9.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "fancycompleter" version))
+       (sha256
+        (base32 "0wkj4h01pxa8prv59zl09a0i3w26k835bfpjgvyvsai4mswgxq09"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (add-after 'unpack 'fix-setup.py
+                    (lambda _
+                      (substitute* "setup.py"
+                        ((".*setupmeta.*")
+                         "")
+                        (("versioning=.*")
+                         (string-append "version='" ,version "',"))
+                        ((".*pyrepl.*") ;broken on Python 3
+                         "")))))))
+    (home-page "https://github.com/pdbpp/fancycompleter")
+    (synopsis "TAB completion library for Python")
+    (description "@code{fancycompleter} is a module that adds TAB completion
+to the interactive prompt.  It is an extension of the @code{rlcompleter}
+module from the standard Python library.")
+    (license license:bsd-3)))
+
+(define-public python-pdbpp
+  (package
+    (name "python-pdbpp")
+    (version "0.10.3")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pdbpp" version))
+       (sha256
+        (base32
+         "1xb9yvi30rb1cdpvfdk2kg79vh3anvkz91r8bwvfp3iqv97kzr6r"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (replace 'check
+           (lambda* (#:key tests? #:allow-other-keys)
+             (when tests?
+               (invoke "pytest"
+                       "-k"
+                       (string-append
+                        ;; These tests seem to require a real TTY.
+                        "not interaction_restores_previous_sigint_handler "
+                        "and not python_m_pdb_uses_pdbpp"))))))))
+    (propagated-inputs
+     `(("python-fancycompleter" ,python-fancycompleter)
+       ("python-pygments" ,python-pygments)
+       ("python-wmctrl" ,python-wmctrl)))
+    (native-inputs
+     `(("python-pytest" ,python-pytest)
+       ("python-setuptools-scm" ,python-setuptools-scm)))
+    (home-page "https://github.com/pdbpp/pdbpp")
+    (synopsis "Drop-in replacement for pdb")
+    (description "Pdb++ is a drop-in replacement for @code{pdb}.  It
+includes the following improvements compared to @code{pdb}:
+@itemize
+@item auto-completion
+@item syntax highlighting of code listings
+@item sticky mode
+@item new commands to be used from the interactive (Pdb++) prompt
+@item smart command parsing
+@item additional convenience functions in the @code{pdb} module.
+@end itemize")
+    (license license:bsd-3)))
+
 (define-public python-pdftotext
   (package
     (name "python-pdftotext")
@@ -5550,6 +5650,83 @@ humans, and implementation simplicity.")
     (home-page "https://github.com/jalan/pdftotext")
     (synopsis "Simple PDF text extraction")
     (description "Pdftotext is a Python library of PDF text extraction.")
+    (license license:expat)))
+
+(define-public python-pluginbase
+  (package
+    (name "python-pluginbase")
+    (version "1.0.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pluginbase" version))
+       (sha256
+        (base32
+         "11z2vvbp13828y0x3w39f29p9r9xcix7h7c4fff2w8yfiylk6v7z"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (replace 'check
+                    (lambda* (#:key tests? #:allow-other-keys)
+                      (when tests?
+                        (invoke "make" "test")))))))
+    (native-inputs `(("python-pytest" ,python-pytest)))
+    (home-page "https://github.com/mitsuhiko/pluginbase")
+    (synopsis "Simple but flexible plugin system for Python")
+    (description "PluginBase is a library useful in the development of
+flexible plugin systems in Python.")
+    (license license:bsd-3)))
+
+(define-public python-node-semver
+  (package
+    (name "python-node-semver")
+    (version "0.8.1")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "node-semver" version))
+       (sha256
+        (base32
+         "000ypfns5x72b41w5f9pk6k3jnr35scliqfbvmilyvv0178005i8"))))
+    (build-system python-build-system)
+    (native-inputs
+     `(("python-pytest" ,python-pytest)))
+    (home-page "https://github.com/podhmo/python-node-semver")
+    (synopsis "Python port of node-semver")
+    (description "This module provides a Python version of node-semver, a
+semantic version parser for Node.js.")
+    (license license:expat)))
+
+(define-public python-patch-ng
+  (package
+    (name "python-patch-ng")
+    (version "1.17.4")
+    (source
+     (origin
+       (method git-fetch)               ;no tests in PyPI archive
+       (uri (git-reference
+             (url "https://github.com/conan-io/python-patch-ng")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0qxn4ss2s54qy87xrpcybz26kp2fwlaq41x4k9jcmp6d7p0w569m"))))
+    (build-system python-build-system)
+    (arguments
+     `(#:phases (modify-phases %standard-phases
+                  (replace 'check
+                    (lambda* (#:key tests? #:allow-other-keys)
+                      (when tests?
+                        (invoke "tests/run_tests.py" "-v")))))))
+    (home-page "https://github.com/conan-io/python-patch-ng")
+    (synopsis "Python library to parse and apply unified diffs")
+    (description "Patch NG (New Generation) is a command and Python library to
+parse and apply unified diffs.  It has features such as:
+@itemize
+@item automatic correction of common patch formatting corruption
+@item patch format detection (SVN, Hg, Git)
+@item nice diffstat histogram.
+@end itemize")
     (license license:expat)))
 
 (define-public python-pyparsing
@@ -9319,6 +9496,28 @@ PEP 8.")
 (define-public python2-pep8
   (package-with-python2 python-pep8))
 
+(define-public python-pep8-naming
+  (package
+    (name "python-pep8-naming")
+    (version "0.12.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "pep8-naming" version))
+       (sha256
+        (base32
+         "04kyh9hkpyc8jzj16d1kkk29b5n8miqdvbs0zm035n1z5z5kx6hz"))))
+    (build-system python-build-system)
+    (propagated-inputs
+     `(("python-flake8" ,python-flake8)
+       ("python-flake8-polyfill" ,python-flake8-polyfill)))
+    (home-page "https://github.com/PyCQA/pep8-naming")
+    (synopsis "Check PEP-8 naming conventions")
+    (description
+     "This package provides the @code{pep8-naming} Python module, a
+plugin for flake8 to check PEP-8 naming conventions.")
+    (license license:expat)))
+
 (define-public python-pep517
   (package
     (inherit python-pep517-bootstrap)
@@ -9688,6 +9887,27 @@ lints.")
     (home-page "https://github.com/zheller/flake8-quotes/")
     (synopsis "Flake8 lint for quotes")
     (description "This package provides a Flake8 lint for quotes.")
+    (license license:expat)))
+
+(define-public python-flake8-todo
+  (package
+    (name "python-flake8-todo")
+    (version "0.7")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "flake8-todo" version))
+       (sha256
+        (base32
+         "05arm0sch3r8248035kilmf01z0mxsahw6vpbbz0d343zy8m8k3f"))))
+    (build-system python-build-system)
+    (propagated-inputs
+     `(("python-pycodestyle" ,python-pycodestyle)))
+    (home-page "https://github.com/schlamar/flake8-todo")
+    (synopsis "TODO notes checker, plugin for flake8")
+    (description
+     "This package provides the @code{flake8-todo} Python module, a
+TODO notes checker plugin for flake8.")
     (license license:expat)))
 
 (define-public python-autoflake
@@ -11822,6 +12042,27 @@ automatically detect a wide range of file encodings.")
 
 (define-public python2-chardet
   (package-with-python2 python-chardet))
+
+(define-public python-charset-normalizer
+  (package
+    (name "python-charset-normalizer")
+    (version "2.0.5")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "charset-normalizer" version))
+       (sha256
+        (base32 "0rr3iv2xw4rz5ijnfqk229fw85cq6p6rhqqsilm0ldzncblfg63h"))))
+    (build-system python-build-system)
+    (native-inputs
+     `(("python-pytest" ,python-pytest)))
+    (home-page "https://github.com/ousret/charset_normalizer")
+    (synopsis "Universal Charset Detector, alternative to Chardet")
+    (description "This library helps you read text from an unknown charset
+encoding.  Motivated by @code{chardet}, it tries to resolve the issue by
+taking a new approach.  All IANA character set names for which the Python core
+library provides codecs are supported.")
+    (license license:expat)))
 
 (define-public python-docopt
   (package
@@ -27432,4 +27673,52 @@ statements in OFX files.")
 services' API.  It includes a pre-defined set of classes for API resources
 that initialize themselves dynamically from API responses which makes it
 compatible with a wide range of versions of the Stripe API.")
+    (license license:expat)))
+
+(define-public python-platformdirs
+  (package
+    (name "python-platformdirs")
+    (version "2.2.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "platformdirs" version))
+       (sha256
+        (base32 "07hq5qrp7pqj63iczg01wbf5ii6f0ncd0dq5mzkdhsslmg9slbb3"))))
+    (build-system python-build-system)
+    (native-inputs
+     `(("python-appdirs" ,python-appdirs)
+       ("python-pytest" ,python-pytest)
+       ("python-pytest-cov" ,python-pytest-cov)
+       ("python-pytest-mock" ,python-pytest-mock)))
+    (home-page "https://github.com/platformdirs/platformdirs")
+    (synopsis "Determine the appropriate platform-specific directories")
+    (description "When writing applications, finding the right location to
+store user data and configuration varies per platform.  Even for
+single-platform apps, there may by plenty of nuances in figuring out the right
+location.  This small Python module determines the appropriate
+platform-specific directories, e.g. the ``user data dir''.")
+    (license license:expat)))
+
+(define-public python-box
+  (package
+    (name "python-box")
+    (version "5.3.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (pypi-uri "python-box" version))
+       (sha256
+        (base32
+         "0jhrdif57khx2hsw1q6a9x42knwcvq8ijgqyq1jmll6y6ifyzm2f"))))
+    (build-system python-build-system)
+    (propagated-inputs
+     `(("python-msgpack" ,python-msgpack)
+       ("python-ruamel.yaml" ,python-ruamel.yaml)
+       ("python-toml" ,python-toml)))
+    (home-page "https://github.com/cdgriffith/Box")
+    (synopsis "Advanced Python dictionaries with dot notation access")
+    (description
+     "This package provides the @code{python-box} Python module.
+It implements advanced Python dictionaries with dot notation access.")
     (license license:expat)))
