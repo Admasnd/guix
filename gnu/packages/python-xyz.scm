@@ -27381,12 +27381,24 @@ YYYY-MM-DD at the beginning of the file or directory name.")
             "07vrmgnbwsadqih4icml8v7jb4x8sm4vfcf5qqxdar0cakl96ml4"))
         (modules '((guix build utils)))
         (snippet
-         '(begin (substitute* "libagent/device/onlykey.py"
-                   (("class Onlykey\\(interface\\.Device\\):" 
-                     ) 
-                    (string-append  
-                                   "\n" 
-                                   "    def __str__(self):\n        return 'onlykey'\n\n"))
+         '(begin (substitute* "libagent/gpg/__init__.py"
+                   (("( +)(agent_path = util\\.which\\('\\{\\}-gpg-agent'\\.format\\(device_name\\)\\) *\n)"
+                     all
+                     spaces
+                     path)
+                    (string-append spaces
+                                   "if device_type.package_name() == 'onlykey-agent':\n"
+                                   spaces
+                                   spaces
+                                   "agent_path = util.which('onlykey-gpg')\n"
+                                   spaces
+                                   spaces
+                                   "log.info('agent_path: %s', agent_path)\n"
+                                   spaces
+                                   "else:\n"
+                                   spaces
+                                   spaces
+                                   path))
                    )
                  #t))))
     (build-system python-build-system)
