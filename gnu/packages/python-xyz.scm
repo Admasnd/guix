@@ -27390,7 +27390,7 @@ YYYY-MM-DD at the beginning of the file or directory name.")
                                    "if device_type.package_name() == 'onlykey-agent':\n"
                                    spaces
                                    spaces
-                                   "agent_path = util.which('onlykey-gpg')\n"
+                                   "agent_path = util.which('onlykey-gpg-agent')\n"
                                    spaces
                                    spaces
                                    "log.info('agent_path: %s', agent_path)\n"
