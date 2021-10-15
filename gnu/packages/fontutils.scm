@@ -1011,3 +1011,26 @@ PostScript Type 1, Type 1 Multiple Master, OpenType, and TrueType fonts.
 These tools are cfftot1, mmafm, mmpfb, otfinfo, otftotfm, t1dotlessj, t1lint,
 t1rawfm, t1reencode, t1testpage and ttftotype42.")
     (license license:gpl2+)))
+
+(define-public python-psautohint
+  (package
+    (name "python-psautohint")
+    (version "2.3.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "psautohint" version ".zip"))
+        (sha256
+          (base32 "1m2i3bs1hbi5xd0a3h8q5xs590s6sfmvj54pf25wyn6cszgjj9gz"))))
+    (build-system python-build-system)
+    (propagated-inputs `(("python-fonttools" ,python-fonttools)))
+    (native-inputs
+      `(("unzip" ,unzip)
+        ("python-pytest" ,python-pytest)
+        ("python-pytest-cov" ,python-pytest-cov)
+        ("python-pytest-randomly" ,python-pytest-randomly)
+        ("python-pytest-xdist" ,python-pytest-xdist)))
+    (home-page "https://github.com/adobe-type-tools/psautohint")
+    (synopsis "Python wrapper for Adobe's PostScript autohinter")
+    (description "Python wrapper for Adobe's PostScript autohinter")
+    (license license:asl2.0)))

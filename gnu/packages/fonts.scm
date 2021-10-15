@@ -80,7 +80,8 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages python)
   #:use-module (gnu packages python-xyz)
-  #:use-module (gnu packages xorg))
+  #:use-module (gnu packages xorg)
+  #:use-module (gnu packages fontutils))
 
 (define-public font-ibm-plex
   (package
@@ -200,18 +201,20 @@ Cyrillic, Canadian Syllabics and most Latin based languages are supported.")
 (define-public font-cantarell
   (package
     (name "font-abattis-cantarell")
-    (version "0.301")
+    (version "0.303")
     (source (origin
-              (method url-fetch)
-              (uri (string-append "mirror://gnome/sources/cantarell-fonts/"
-                                  (version-major+minor version)
-                                  "/cantarell-fonts-" version ".tar.xz"))
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://gitlab.gnome.org/GNOME/cantarell-fonts.git")
+                    (commit (string-append "v" version))))
               (sha256
                (base32
-                "10sycxscs9kzl451mhygyj2qj8qlny8pamskb86np7izq05dnd9x"))))
+                "1d1ay0fdqchk0wa5yqxis2c98imvzsbbd2kjv0x8sk4fm419847b"))))
     (build-system meson-build-system)
     (native-inputs
-     `(("gettext" ,gettext-minimal)))   ; for msgfmt
+     `(("gettext" ,gettext-minimal) ; for msgfmt
+       ("python-psautohint" ,python-psautohint)
+       ("python-importlib-metadata" ,python-importlib-metadata)))   
     (home-page "https://wiki.gnome.org/Projects/CantarellFonts")
     (synopsis "Cantarell sans-serif typeface")
     (description "The Cantarell font family is a contemporary Humanist

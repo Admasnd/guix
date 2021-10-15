@@ -7759,21 +7759,31 @@ for older versions of Python.")
 (define-public python-importlib-metadata
   (package
     (name "python-importlib-metadata")
-    (version "1.5.0")
+    (version "4.8.1")
     (source
      (origin
        (method url-fetch)
        (uri (pypi-uri "importlib_metadata" version))
        (sha256
         (base32
-         "00ikdj4gjhankdljnz7g5ggak4k9lql2926x0x117ir9j2lv7x86"))))
+         "1c93dwrdzrqgg9wlsypiixl3jlvgrlnbp1mb0dfixban2bhv717j"))))
     (build-system python-build-system)
     (propagated-inputs
      `(("python-zipp" ,python-zipp)))
     (native-inputs
-     `(("python-setuptools-scm" ,python-setuptools-scm)
-       ("python-pyfakefs" ,python-pyfakefs)
-       ("python-packaging" ,python-packaging)))
+     `(("python-flake8" ,python-flake8)
+      ("python-importlib-resources" ,python-importlib-resources)
+      ("python-packaging" ,python-packaging)
+      ("python-pep517" ,python-pep517)
+      ("python-pyfakefs" ,python-pyfakefs)
+      ("python-pytest" ,python-pytest)
+      ("python-pytest-black" ,python-pytest-black)
+      ("python-pytest-checkdocs" ,python-pytest-checkdocs)
+      ("python-pytest-cov" ,python-pytest-cov)
+      ("python-pytest-enabler" ,python-pytest-enabler)
+      ("python-pytest-flake8" ,python-pytest-flake8)
+      ("python-pytest-mypy" ,python-pytest-mypy)
+      ("python-pytest-perf" ,python-pytest-perf)))
     (home-page "https://importlib-metadata.readthedocs.io/")
     (synopsis "Read metadata from Python packages")
     (description
@@ -27322,4 +27332,24 @@ and powerful way to handle real-world data, featuring:
     (description
      "This package provides the @code{python-box} Python module.
 It implements advanced Python dictionaries with dot notation access.")
+    (license license:expat)))
+
+(define-public python-pytest-randomly
+  (package
+    (name "python-pytest-randomly")
+    (version "3.10.1")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (pypi-uri "pytest-randomly" version))
+        (sha256
+          (base32 "0r1sy9p35dapav5418qzway0dfgiyc7a5iyfwjjfchp54yzmvvyl"))))
+    (build-system python-build-system)
+    (propagated-inputs
+      `(("python-importlib-metadata" ,python-importlib-metadata)
+        ("python-pytest" ,python-pytest)))
+    (home-page "https://github.com/pytest-dev/pytest-randomly")
+    (synopsis "Pytest plugin to randomly order tests and control random.seed.")
+    (description
+      "Pytest plugin to randomly order tests and control random.seed.")
     (license license:expat)))
